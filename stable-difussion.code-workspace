@@ -3,5 +3,23 @@
 		{
 			"path": "."
 		}
-	]
+	],
+  "settings": {
+    "terminal.integrated.env.windows": {
+      "BASH_INIT_COMMAND": "conda activate pytorch"
+    }
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Python: Not Just My Code",
+        "type": "python",
+        "request": "launch",
+        "program": "${file}",
+        "console": "integratedTerminal",
+        "justMyCode": false
+      }
+    ]
+  }
 }
