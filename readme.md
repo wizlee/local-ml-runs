@@ -19,6 +19,8 @@ Exploring the world of stable difussion
     # Wait for "Running on local URL:  http://127.0.0.1:7860" and open that URI.
     ```
     - note that `webui-user.bat` will create a python virtual environment despite dedicated conda environment is created. If you don't prefer this to happen perform what the script does manually. 
+- Need use additional arg of `--xformers` and `--medvram` if GPU VRAM is less than 12GB. After using these arg web server is successfully launched even using GPU of only 2GB VRAM.
+    - HOWEVER, there might still be error when trying to generate image using GPU with less VRAM (i.e. 2GB)
 
 
 ## References
