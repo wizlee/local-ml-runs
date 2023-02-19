@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="" data-theme="light">
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="https://chat.openai.com/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ChatGPT Conversation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>hljs.highlightAll()
+</script>
+
+    <style>
+        :root {
+            --tw-prose-code: #111827;
+            --tw-prose-hr: #e5e7eb;
+            --tw-prose-links: #111827;
+            --tw-prose-headings: #111827;
+            --tw-prose-quotes: #111827;
+            --page-bg: #f7f7f8;
+            --page-text: #374151;
+            --conversation-odd-bg: rgba(247,247,248);
+            --th-boarders: #4b5563;
+            --td-boarders: #374151;
+        }
+
+        [data-theme="dark"] {
+            --tw-prose-code: #f9fafb;
+            --tw-prose-hr: #374151;
+            --tw-prose-links: #fff;
+            --tw-prose-headings: #fff;
+            --tw-prose-quotes: #f3f4f6;
+            --page-bg: rgba(52,53,65);
+            --page-text: #fff;
+            --conversation-odd-bg: rgb(68,70,84);
+        }
+
+        * {
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--page-text);
+            background-color: var(--page-bg);
+            margin: 0;
+            padding: 0;
+        }
+
+        [data-theme="light"] .sun {
+            display: none;
+        }
+
+        [data-theme="dark"] .moon {
+            display: none;
+        }
+
+        .toggle {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            background-color: #fff;
+            border: 1px solid #e2e8f0;
+        }
+
+        a {
+            color: var(--tw-prose-links);
+            font-weight: 500;
+            text-decoration-line: underline;
+            text-underline-offset: 2px;
+        }
+
+        .conversation-content > p:first-child,
+        ol:first-child {
+            margin-top: 0;
+        }
+
+        p>code, li>code {
+            color: var(--tw-prose-code);
+            font-weight: 600;
+            font-size: .875em;
+        }
+
+        p>code::before,
+        p>code::after,
+        li>code::before,
+        li>code::after {
+            content: "`";
+        }
+
+        hr {
+            width: 100%;
+            height: 0;
+            border: 1px solid var(--tw-prose-hr);
+            margin-bottom: 1em;
+            margin-top: 1em;
+        }
+
+        pre {
+            color: #ffffff;
+            background-color: #000000;
+            overflow-x: auto;
+            margin: 0;
+            border-radius: 0.375rem;
+        }
+
+        pre>code {
+            font-family: Söhne Mono, Monaco, Andale Mono, Ubuntu Mono, monospace !important;
+            font-weight: 400;
+            font-size: .875em;
+            line-height: 1.7142857;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            color: var(--tw-prose-headings);
+            margin: 0;
+        }
+
+        h1 {
+            font-size: 2.25em;
+            font-weight: 600;
+            line-height: 1.1111111;
+            margin-bottom: 0.8888889em;
+            margin-top: 0;
+        }
+
+        h2 {
+            font-size: 1.5em;
+            font-weight: 700;
+            line-height: 1.3333333;
+            margin-bottom: 1em;
+            margin-top: 2em;
+        }
+
+        h3 {
+            font-size: 1.25em;
+            font-weight: 600;
+            line-height: 1.6;
+            margin-bottom: .6em;
+            margin-top: 1.6em;
+        }
+
+        h4 {
+            font-weight: 400;
+            line-height: 1.5;
+            margin-bottom: .5em;
+            margin-top: 1.5em
+        }
+
+        h3,h4 {
+            margin-bottom: .5rem;
+            margin-top: 1rem;
+        }
+
+        h5 {
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 2px solid rgba(142,142,160,1);
+            color: var(--tw-prose-quotes);
+            font-style: italic;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 1rem;
+            margin: 1.6em 0;
+            padding-left: 1em;
+            quotes: "\201C""\201D""\2018""\2019";
+        }
+
+        blockquote p:first-of-type:before {
+            content: open-quote;
+        }
+
+        blockquote p:last-of-type:after {
+            content: close-quote;
+        }
+
+        ol, ul {
+            padding-left: 1rem;
+        }
+
+        ::marker {
+            color: #6b7280;
+            font-weight: 400;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 0;
+            table-layout: auto;
+            text-align: left;
+            font-size: .875em;
+            line-height: 1.7142857;
+        }
+
+        table * {
+            box-sizing: border-box;
+            border-width: 0;
+            border-style: solid;
+            border-color: #d9d9e3;
+        }
+
+        table thead {
+            border-bottom-color: var(--th-boarders);
+            border-bottom-width: 1px;
+        }
+
+        table th {
+            background-color: rgba(236,236,241,.2);
+            border-bottom-width: 1px;
+            border-left-width: 1px;
+            border-top-width: 1px;
+            padding: 0.25rem 0.75rem;
+        }
+
+        table th:first-child {
+            border-top-left-radius: 0.375rem;
+        }
+
+        table th:last-child {
+            border-right-width: 1px;
+            border-top-right-radius: 0.375rem;
+        }
+
+        table tbody tr {
+            border-bottom-color: var(--td-boarders);
+            border-bottom-width: 1px;
+        }
+
+        table tbody tr:last-child {
+            border-bottom-width: 0;
+        }
+
+        table tbody tr:last-child td:first-child {
+            border-bottom-left-radius: 0.375rem;
+        }
+
+        table tbody tr:last-child td:last-child {
+            border-bottom-right-radius: 0.375rem;
+        }
+
+        table td {
+            border-bottom-width: 1px;
+            border-left-width: 1px;
+            padding: 0.25rem 0.75rem;
+        }
+
+        table td:last-child {
+            border-right-width: 1px;
+        }
+
+        .conversation {
+            margin: 0 auto;
+            max-width: 800px;
+            padding: 1rem;
+        }
+
+        .conversation-header {
+            margin-bottom: 1rem;
+        }
+
+        .conversation-header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .conversation-header .conversation-time {
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .conversation-header .conversation-time-label {
+            font-weight: bold;
+        }
+
+        .conversation-header .conversation-time-value {
+            margin-left: 0.5rem;
+        }
+
+        .conversation-header p {
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .conversation-item {
+            display: flex;
+            padding: 1rem;
+            border-left: 1px solid rgba(0,0,0,.1);
+            border-right: 1px solid rgba(0,0,0,.1);
+            border-bottom: 1px solid rgba(0,0,0,.1);
+        }
+
+        .conversation-item:first-of-type {
+            border-top: 1px solid rgba(0,0,0,.1);
+        }
+
+        .conversation-item:nth-child(odd) {
+            background-color: var(--conversation-odd-bg);
+        }
+
+        .author {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 30px;
+            height: 30px;
+            border-radius: 0.125rem;
+            margin-right: 1rem;
+            background-color: rgb(16, 163, 127);
+        }
+
+        .author svg {
+            color: #fff;
+        }
+
+        .author img {
+            width: 100%;
+            height: 100%;
+        }
+
+        .conversation-content-wrapper {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .conversation-content {
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="conversation">
+        <div class="conversation-header">
+            <h1>ChatGPT Conversation
+                <button class="toggle">
+                    <svg class="sun" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <svg class="moon" stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                </button>
+            </h1>
+            <div class="conversation-time">
+                <span class="conversation-time-label">Time:</span>
+                <span class="conversation-time-value">2023-02-14T16:52:13.764Z</span>
+            </div>
+            <p>Generated by <a href="https://github.com/pionxzh/chatgpt-exporter">ChatGPT Exporter</a></p>
+        </div>
+
+        
+<div class="conversation-item">
+    <div class="author">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAABBVJREFUWEftlutPW2Ucxz/nUnqhQAYqWGCibDO64Jb4wluMJgY2HDCnTLKli1Ff+Ed4+zt4ycwS3YRMGJcB68gwJCSa8MoRtm4xk4sFDLbO0vZczHN6CqflrB2YveNJmuac5/L7PN/f7Ui9F780yRsSIH6ANeN4zl/o8iQ2mFvbSy4Xp+8D5Ctgy53nlCfugq8c5iQwbf/viIvH8eieYuDrbYBdB10hVA6gIK5zQe1yB6n34pMCyEEUd6HU2+cAsAgfvcE0TSRJQpFldMOw89ROuy3XiWdhXMyLIW+ntasCfd8U6lWwQUIY9qgeUqkUsiLj8/kwDINMJgVSBkWRwVTRdROPx2MZz2ib6LqGqvpKAXzrArCNqipZw7V1tSwtLaMqCoHyclaWl6mte5pUOoHP78PQFBKJfy11gpXl6PomsiyRTuu2Cu5BLPX2FQcQLonHE3i9Xjyqap0SDAYtKMPUkWXNepfJSKQ2M9a6VDpJoLwMVZXRNHE/t8zKApUESKXStLa2Eo1GWVtbtwxXVlbQ3NzM1FSEioqAZaC2tpHnm5qZnZ3l+PEW7tz9jYyWQtNELPwPgGQySTgctuSfmZlBkmSOHn2Zt159m/FbI0Sjd62bnzp1hoA/yMjoCD0fd3Pj5nVWVv6grKysaAEpqcDDh//Q1dmFP1DOlctX0HSdEyfaaGioZ2Fhgenpn6kIVnH+3Cfcvr3A3NwcPT3d3IiMsfKnABBB+egwKwkgIvnQocO8/tob9A/0o2s67e+3c//+PUKhEENDwzQdfIH2k6fpH7hKIpGwFJiMjBKLLaGokp2WdlJK+e4oAWBaPvd6/VwIf8rE+KR1yivHWrg5NUFnRwfDw9d58chLFuSlS98T8FfS03OWycgIsdgiikcYzNUEkHcLIHI8talzsu1D1tfjxONx6uuf4ceB7whfOM+D32OEQs+S1hIMXxsjVHeEzo4uJiKDxFYfZBVwABQGREkFJFFjdJVjLW/y3MHDVnGJ3ptnemaM1tb3eKq6nuqaA/zy6y3m5+9QXdVEZ8dpJiI/OQD2HAPZ5qLIZfh9NZztPme5ZHBogI2/l2hsbODdd9rIaGkGhy5jGCZeT40FMD45yOraIooqSvE2gCjlziH1upbi3JLsRkX2kEyanPngI2RZoX/gByqrfGxs/MXnn33B4tIio6NXOVBdg6l7bYBrrK4u4/WJLNgeLgCFzShXNxyymeIWKlj/Yl4EVSYb3aaSfSWLkiu+J4RBCVkyMBDvDKuX5MZOAGc73lpm9/Xs0fbBzi5p2BC5efFvR7oFlEs90T2L1iHxUeqiQF7hcAugQkCnkVztd7f8mAo4YyAHULRp2kq5KFcgwB4Aiku4c9b5JbRzdpcAuzVeev0+wL4C+woUKvAfO7nSVmrJ+MMAAAAASUVORK5CYII=" alt="You" />
+    </div>
+    <div class="conversation-content-wrapper">
+        <div class="conversation-content">
+            <p>Hi, can you help to write a backup script for windows PC using a tool called rclone?</p>
+        </div>
+    </div>
+</div>
+<div class="conversation-item">
+    <div class="author">
+        <svg width="1.5rem" height="1.5rem" viewBox="0 0 41 41" fill="none" xmlns="http://www.w3.org/2000/svg" strokeWidth="1.5"><path d="M37.5324 16.8707C37.9808 15.5241 38.1363 14.0974 37.9886 12.6859C37.8409 11.2744 37.3934 9.91076 36.676 8.68622C35.6126 6.83404 33.9882 5.3676 32.0373 4.4985C30.0864 3.62941 27.9098 3.40259 25.8215 3.85078C24.8796 2.7893 23.7219 1.94125 22.4257 1.36341C21.1295 0.785575 19.7249 0.491269 18.3058 0.500197C16.1708 0.495044 14.0893 1.16803 12.3614 2.42214C10.6335 3.67624 9.34853 5.44666 8.6917 7.47815C7.30085 7.76286 5.98686 8.3414 4.8377 9.17505C3.68854 10.0087 2.73073 11.0782 2.02839 12.312C0.956464 14.1591 0.498905 16.2988 0.721698 18.4228C0.944492 20.5467 1.83612 22.5449 3.268 24.1293C2.81966 25.4759 2.66413 26.9026 2.81182 28.3141C2.95951 29.7256 3.40701 31.0892 4.12437 32.3138C5.18791 34.1659 6.8123 35.6322 8.76321 36.5013C10.7141 37.3704 12.8907 37.5973 14.9789 37.1492C15.9208 38.2107 17.0786 39.0587 18.3747 39.6366C19.6709 40.2144 21.0755 40.5087 22.4946 40.4998C24.6307 40.5054 26.7133 39.8321 28.4418 38.5772C30.1704 37.3223 31.4556 35.5506 32.1119 33.5179C33.5027 33.2332 34.8167 32.6547 35.9659 31.821C37.115 30.9874 38.0728 29.9178 38.7752 28.684C39.8458 26.8371 40.3023 24.6979 40.0789 22.5748C39.8556 20.4517 38.9639 18.4544 37.5324 16.8707ZM22.4978 37.8849C20.7443 37.8874 19.0459 37.2733 17.6994 36.1501C17.7601 36.117 17.8666 36.0586 17.936 36.0161L25.9004 31.4156C26.1003 31.3019 26.2663 31.137 26.3813 30.9378C26.4964 30.7386 26.5563 30.5124 26.5549 30.2825V19.0542L29.9213 20.998C29.9389 21.0068 29.9541 21.0198 29.9656 21.0359C29.977 21.052 29.9842 21.0707 29.9867 21.0902V30.3889C29.9842 32.375 29.1946 34.2791 27.7909 35.6841C26.3872 37.0892 24.4838 37.8806 22.4978 37.8849ZM6.39227 31.0064C5.51397 29.4888 5.19742 27.7107 5.49804 25.9832C5.55718 26.0187 5.66048 26.0818 5.73461 26.1244L13.699 30.7248C13.8975 30.8408 14.1233 30.902 14.3532 30.902C14.583 30.902 14.8088 30.8408 15.0073 30.7248L24.731 25.1103V28.9979C24.7321 29.0177 24.7283 29.0376 24.7199 29.0556C24.7115 29.0736 24.6988 29.0893 24.6829 29.1012L16.6317 33.7497C14.9096 34.7416 12.8643 35.0097 10.9447 34.4954C9.02506 33.9811 7.38785 32.7263 6.39227 31.0064ZM4.29707 13.6194C5.17156 12.0998 6.55279 10.9364 8.19885 10.3327C8.19885 10.4013 8.19491 10.5228 8.19491 10.6071V19.808C8.19351 20.0378 8.25334 20.2638 8.36823 20.4629C8.48312 20.6619 8.64893 20.8267 8.84863 20.9404L18.5723 26.5542L15.206 28.4979C15.1894 28.5089 15.1703 28.5155 15.1505 28.5173C15.1307 28.5191 15.1107 28.516 15.0924 28.5082L7.04046 23.8557C5.32135 22.8601 4.06716 21.2235 3.55289 19.3046C3.03862 17.3858 3.30624 15.3413 4.29707 13.6194ZM31.955 20.0556L22.2312 14.4411L25.5976 12.4981C25.6142 12.4872 25.6333 12.4805 25.6531 12.4787C25.6729 12.4769 25.6928 12.4801 25.7111 12.4879L33.7631 17.1364C34.9967 17.849 36.0017 18.8982 36.6606 20.1613C37.3194 21.4244 37.6047 22.849 37.4832 24.2684C37.3617 25.6878 36.8382 27.0432 35.9743 28.1759C35.1103 29.3086 33.9415 30.1717 32.6047 30.6641C32.6047 30.5947 32.6047 30.4733 32.6047 30.3889V21.188C32.6066 20.9586 32.5474 20.7328 32.4332 20.5338C32.319 20.3348 32.154 20.1698 31.955 20.0556ZM35.3055 15.0128C35.2464 14.9765 35.1431 14.9142 35.069 14.8717L27.1045 10.2712C26.906 10.1554 26.6803 10.0943 26.4504 10.0943C26.2206 10.0943 25.9948 10.1554 25.7963 10.2712L16.0726 15.8858V11.9982C16.0715 11.9783 16.0753 11.9585 16.0837 11.9405C16.0921 11.9225 16.1048 11.9068 16.1207 11.8949L24.1719 7.25025C25.4053 6.53903 26.8158 6.19376 28.2383 6.25482C29.6608 6.31589 31.0364 6.78077 32.2044 7.59508C33.3723 8.40939 34.2842 9.53945 34.8334 10.8531C35.3826 12.1667 35.5464 13.6095 35.3055 15.0128ZM14.2424 21.9419L10.8752 19.9981C10.8576 19.9893 10.8423 19.9763 10.8309 19.9602C10.8195 19.9441 10.8122 19.9254 10.8098 19.9058V10.6071C10.8107 9.18295 11.2173 7.78848 11.9819 6.58696C12.7466 5.38544 13.8377 4.42659 15.1275 3.82264C16.4173 3.21869 17.8524 2.99464 19.2649 3.1767C20.6775 3.35876 22.0089 3.93941 23.1034 4.85067C23.0427 4.88379 22.937 4.94215 22.8668 4.98473L14.9024 9.58517C14.7025 9.69878 14.5366 9.86356 14.4215 10.0626C14.3065 10.2616 14.2466 10.4877 14.2479 10.7175L14.2424 21.9419ZM16.071 17.9991L20.4018 15.4978L24.7325 17.9975V22.9985L20.4018 25.4983L16.071 22.9985V17.9991Z" fill="currentColor"></path></svg>
+    </div>
+    <div class="conversation-content-wrapper">
+        <div class="conversation-content">
+            <p>Sure, here&#039;s an example backup script for Windows PC using rclone:</p><pre><code class="language-vbnet">@echo off
+
+rem Set variables
+set SRC=&quot;C:\path\to\folder&quot;
+set DEST=&quot;remote:backup&quot;
+set LOG=&quot;C:\path\to\backup\log.txt&quot;
+
+rem Run backup with rclone
+rclone sync %SRC% %DEST% --log-file=%LOG%
+
+rem Exit script
+exit
+</code></pre><p>In this script, replace &quot;C:\path\to\folder&quot; with the path to the folder you want to backup, &quot;remote:backup&quot; with the name of your remote backup location, and &quot;C:\path\to\backup\log.txt&quot; with the path to the log file you want to create.</p><p>Save the script with a .bat extension and run it to initiate the backup process.</p>
+        </div>
+    </div>
+</div>
+<div class="conversation-item">
+    <div class="author">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAABBVJREFUWEftlutPW2Ucxz/nUnqhQAYqWGCibDO64Jb4wluMJgY2HDCnTLKli1Ff+Ed4+zt4ycwS3YRMGJcB68gwJCSa8MoRtm4xk4sFDLbO0vZczHN6CqflrB2YveNJmuac5/L7PN/f7Ui9F780yRsSIH6ANeN4zl/o8iQ2mFvbSy4Xp+8D5Ctgy53nlCfugq8c5iQwbf/viIvH8eieYuDrbYBdB10hVA6gIK5zQe1yB6n34pMCyEEUd6HU2+cAsAgfvcE0TSRJQpFldMOw89ROuy3XiWdhXMyLIW+ntasCfd8U6lWwQUIY9qgeUqkUsiLj8/kwDINMJgVSBkWRwVTRdROPx2MZz2ib6LqGqvpKAXzrArCNqipZw7V1tSwtLaMqCoHyclaWl6mte5pUOoHP78PQFBKJfy11gpXl6PomsiyRTuu2Cu5BLPX2FQcQLonHE3i9Xjyqap0SDAYtKMPUkWXNepfJSKQ2M9a6VDpJoLwMVZXRNHE/t8zKApUESKXStLa2Eo1GWVtbtwxXVlbQ3NzM1FSEioqAZaC2tpHnm5qZnZ3l+PEW7tz9jYyWQtNELPwPgGQySTgctuSfmZlBkmSOHn2Zt159m/FbI0Sjd62bnzp1hoA/yMjoCD0fd3Pj5nVWVv6grKysaAEpqcDDh//Q1dmFP1DOlctX0HSdEyfaaGioZ2Fhgenpn6kIVnH+3Cfcvr3A3NwcPT3d3IiMsfKnABBB+egwKwkgIvnQocO8/tob9A/0o2s67e+3c//+PUKhEENDwzQdfIH2k6fpH7hKIpGwFJiMjBKLLaGokp2WdlJK+e4oAWBaPvd6/VwIf8rE+KR1yivHWrg5NUFnRwfDw9d58chLFuSlS98T8FfS03OWycgIsdgiikcYzNUEkHcLIHI8talzsu1D1tfjxONx6uuf4ceB7whfOM+D32OEQs+S1hIMXxsjVHeEzo4uJiKDxFYfZBVwABQGREkFJFFjdJVjLW/y3MHDVnGJ3ptnemaM1tb3eKq6nuqaA/zy6y3m5+9QXdVEZ8dpJiI/OQD2HAPZ5qLIZfh9NZztPme5ZHBogI2/l2hsbODdd9rIaGkGhy5jGCZeT40FMD45yOraIooqSvE2gCjlziH1upbi3JLsRkX2kEyanPngI2RZoX/gByqrfGxs/MXnn33B4tIio6NXOVBdg6l7bYBrrK4u4/WJLNgeLgCFzShXNxyymeIWKlj/Yl4EVSYb3aaSfSWLkiu+J4RBCVkyMBDvDKuX5MZOAGc73lpm9/Xs0fbBzi5p2BC5efFvR7oFlEs90T2L1iHxUeqiQF7hcAugQkCnkVztd7f8mAo4YyAHULRp2kq5KFcgwB4Aiku4c9b5JbRzdpcAuzVeev0+wL4C+woUKvAfO7nSVmrJ+MMAAAAASUVORK5CYII=" alt="You" />
+    </div>
+    <div class="conversation-content-wrapper">
+        <div class="conversation-content">
+            <p>That&#039;s great, can you also include the steps needed to configure and setup rclone to work with Microsoft SharePoint site?</p>
+        </div>
+    </div>
+</div>
+<div class="conversation-item">
+    <div class="author">
+        <svg width="1.5rem" height="1.5rem" viewBox="0 0 41 41" fill="none" xmlns="http://www.w3.org/2000/svg" strokeWidth="1.5"><path d="M37.5324 16.8707C37.9808 15.5241 38.1363 14.0974 37.9886 12.6859C37.8409 11.2744 37.3934 9.91076 36.676 8.68622C35.6126 6.83404 33.9882 5.3676 32.0373 4.4985C30.0864 3.62941 27.9098 3.40259 25.8215 3.85078C24.8796 2.7893 23.7219 1.94125 22.4257 1.36341C21.1295 0.785575 19.7249 0.491269 18.3058 0.500197C16.1708 0.495044 14.0893 1.16803 12.3614 2.42214C10.6335 3.67624 9.34853 5.44666 8.6917 7.47815C7.30085 7.76286 5.98686 8.3414 4.8377 9.17505C3.68854 10.0087 2.73073 11.0782 2.02839 12.312C0.956464 14.1591 0.498905 16.2988 0.721698 18.4228C0.944492 20.5467 1.83612 22.5449 3.268 24.1293C2.81966 25.4759 2.66413 26.9026 2.81182 28.3141C2.95951 29.7256 3.40701 31.0892 4.12437 32.3138C5.18791 34.1659 6.8123 35.6322 8.76321 36.5013C10.7141 37.3704 12.8907 37.5973 14.9789 37.1492C15.9208 38.2107 17.0786 39.0587 18.3747 39.6366C19.6709 40.2144 21.0755 40.5087 22.4946 40.4998C24.6307 40.5054 26.7133 39.8321 28.4418 38.5772C30.1704 37.3223 31.4556 35.5506 32.1119 33.5179C33.5027 33.2332 34.8167 32.6547 35.9659 31.821C37.115 30.9874 38.0728 29.9178 38.7752 28.684C39.8458 26.8371 40.3023 24.6979 40.0789 22.5748C39.8556 20.4517 38.9639 18.4544 37.5324 16.8707ZM22.4978 37.8849C20.7443 37.8874 19.0459 37.2733 17.6994 36.1501C17.7601 36.117 17.8666 36.0586 17.936 36.0161L25.9004 31.4156C26.1003 31.3019 26.2663 31.137 26.3813 30.9378C26.4964 30.7386 26.5563 30.5124 26.5549 30.2825V19.0542L29.9213 20.998C29.9389 21.0068 29.9541 21.0198 29.9656 21.0359C29.977 21.052 29.9842 21.0707 29.9867 21.0902V30.3889C29.9842 32.375 29.1946 34.2791 27.7909 35.6841C26.3872 37.0892 24.4838 37.8806 22.4978 37.8849ZM6.39227 31.0064C5.51397 29.4888 5.19742 27.7107 5.49804 25.9832C5.55718 26.0187 5.66048 26.0818 5.73461 26.1244L13.699 30.7248C13.8975 30.8408 14.1233 30.902 14.3532 30.902C14.583 30.902 14.8088 30.8408 15.0073 30.7248L24.731 25.1103V28.9979C24.7321 29.0177 24.7283 29.0376 24.7199 29.0556C24.7115 29.0736 24.6988 29.0893 24.6829 29.1012L16.6317 33.7497C14.9096 34.7416 12.8643 35.0097 10.9447 34.4954C9.02506 33.9811 7.38785 32.7263 6.39227 31.0064ZM4.29707 13.6194C5.17156 12.0998 6.55279 10.9364 8.19885 10.3327C8.19885 10.4013 8.19491 10.5228 8.19491 10.6071V19.808C8.19351 20.0378 8.25334 20.2638 8.36823 20.4629C8.48312 20.6619 8.64893 20.8267 8.84863 20.9404L18.5723 26.5542L15.206 28.4979C15.1894 28.5089 15.1703 28.5155 15.1505 28.5173C15.1307 28.5191 15.1107 28.516 15.0924 28.5082L7.04046 23.8557C5.32135 22.8601 4.06716 21.2235 3.55289 19.3046C3.03862 17.3858 3.30624 15.3413 4.29707 13.6194ZM31.955 20.0556L22.2312 14.4411L25.5976 12.4981C25.6142 12.4872 25.6333 12.4805 25.6531 12.4787C25.6729 12.4769 25.6928 12.4801 25.7111 12.4879L33.7631 17.1364C34.9967 17.849 36.0017 18.8982 36.6606 20.1613C37.3194 21.4244 37.6047 22.849 37.4832 24.2684C37.3617 25.6878 36.8382 27.0432 35.9743 28.1759C35.1103 29.3086 33.9415 30.1717 32.6047 30.6641C32.6047 30.5947 32.6047 30.4733 32.6047 30.3889V21.188C32.6066 20.9586 32.5474 20.7328 32.4332 20.5338C32.319 20.3348 32.154 20.1698 31.955 20.0556ZM35.3055 15.0128C35.2464 14.9765 35.1431 14.9142 35.069 14.8717L27.1045 10.2712C26.906 10.1554 26.6803 10.0943 26.4504 10.0943C26.2206 10.0943 25.9948 10.1554 25.7963 10.2712L16.0726 15.8858V11.9982C16.0715 11.9783 16.0753 11.9585 16.0837 11.9405C16.0921 11.9225 16.1048 11.9068 16.1207 11.8949L24.1719 7.25025C25.4053 6.53903 26.8158 6.19376 28.2383 6.25482C29.6608 6.31589 31.0364 6.78077 32.2044 7.59508C33.3723 8.40939 34.2842 9.53945 34.8334 10.8531C35.3826 12.1667 35.5464 13.6095 35.3055 15.0128ZM14.2424 21.9419L10.8752 19.9981C10.8576 19.9893 10.8423 19.9763 10.8309 19.9602C10.8195 19.9441 10.8122 19.9254 10.8098 19.9058V10.6071C10.8107 9.18295 11.2173 7.78848 11.9819 6.58696C12.7466 5.38544 13.8377 4.42659 15.1275 3.82264C16.4173 3.21869 17.8524 2.99464 19.2649 3.1767C20.6775 3.35876 22.0089 3.93941 23.1034 4.85067C23.0427 4.88379 22.937 4.94215 22.8668 4.98473L14.9024 9.58517C14.7025 9.69878 14.5366 9.86356 14.4215 10.0626C14.3065 10.2616 14.2466 10.4877 14.2479 10.7175L14.2424 21.9419ZM16.071 17.9991L20.4018 15.4978L24.7325 17.9975V22.9985L20.4018 25.4983L16.071 22.9985V17.9991Z" fill="currentColor"></path></svg>
+    </div>
+    <div class="conversation-content-wrapper">
+        <div class="conversation-content">
+            <p>Certainly! Here are the steps to configure and set up rclone to work with Microsoft SharePoint site:</p><ol><li>Install rclone by downloading the appropriate version for your operating system from the official rclone website: <a href="https://rclone.org/downloads/" target="_blank" rel="noopener noreferrer">https://rclone.org/downloads/</a></li><li>Open a command prompt or terminal and run the command &quot;rclone config&quot; to start the configuration process.</li><li>Type &quot;n&quot; to create a new remote.</li><li>Give your remote a name (e.g. &quot;sharepoint&quot;).</li><li>Choose &quot;Microsoft OneDrive&quot; as the type of storage.</li><li>Leave the &quot;Microsoft App Client ID&quot; and &quot;Microsoft App Client Secret&quot; fields blank.</li><li>Choose &quot;no&quot; for &quot;Edit advanced config?&quot;.</li><li>Choose &quot;yes&quot; for &quot;Use auto config?&quot;.</li><li>Follow the link provided and sign in with your Microsoft account. Grant permission for rclone to access your OneDrive account.</li><li>Enter &quot;y&quot; to confirm the setup was successful.</li><li>Type &quot;q&quot; to exit the configuration process.</li><li>You can now use the remote you just created to access your Microsoft SharePoint site. For example, to list the contents of the root folder of your SharePoint site, you can run the command &quot;rclone lsd sharepoint:&quot;.</li></ol><p>That&#039;s it! You can now use rclone to backup files to or from your Microsoft SharePoint site using the remote you just created.</p>
+        </div>
+    </div>
+</div>
+<div class="conversation-item">
+    <div class="author">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAABBVJREFUWEftlutPW2Ucxz/nUnqhQAYqWGCibDO64Jb4wluMJgY2HDCnTLKli1Ff+Ed4+zt4ycwS3YRMGJcB68gwJCSa8MoRtm4xk4sFDLbO0vZczHN6CqflrB2YveNJmuac5/L7PN/f7Ui9F780yRsSIH6ANeN4zl/o8iQ2mFvbSy4Xp+8D5Ctgy53nlCfugq8c5iQwbf/viIvH8eieYuDrbYBdB10hVA6gIK5zQe1yB6n34pMCyEEUd6HU2+cAsAgfvcE0TSRJQpFldMOw89ROuy3XiWdhXMyLIW+ntasCfd8U6lWwQUIY9qgeUqkUsiLj8/kwDINMJgVSBkWRwVTRdROPx2MZz2ib6LqGqvpKAXzrArCNqipZw7V1tSwtLaMqCoHyclaWl6mte5pUOoHP78PQFBKJfy11gpXl6PomsiyRTuu2Cu5BLPX2FQcQLonHE3i9Xjyqap0SDAYtKMPUkWXNepfJSKQ2M9a6VDpJoLwMVZXRNHE/t8zKApUESKXStLa2Eo1GWVtbtwxXVlbQ3NzM1FSEioqAZaC2tpHnm5qZnZ3l+PEW7tz9jYyWQtNELPwPgGQySTgctuSfmZlBkmSOHn2Zt159m/FbI0Sjd62bnzp1hoA/yMjoCD0fd3Pj5nVWVv6grKysaAEpqcDDh//Q1dmFP1DOlctX0HSdEyfaaGioZ2Fhgenpn6kIVnH+3Cfcvr3A3NwcPT3d3IiMsfKnABBB+egwKwkgIvnQocO8/tob9A/0o2s67e+3c//+PUKhEENDwzQdfIH2k6fpH7hKIpGwFJiMjBKLLaGokp2WdlJK+e4oAWBaPvd6/VwIf8rE+KR1yivHWrg5NUFnRwfDw9d58chLFuSlS98T8FfS03OWycgIsdgiikcYzNUEkHcLIHI8talzsu1D1tfjxONx6uuf4ceB7whfOM+D32OEQs+S1hIMXxsjVHeEzo4uJiKDxFYfZBVwABQGREkFJFFjdJVjLW/y3MHDVnGJ3ptnemaM1tb3eKq6nuqaA/zy6y3m5+9QXdVEZ8dpJiI/OQD2HAPZ5qLIZfh9NZztPme5ZHBogI2/l2hsbODdd9rIaGkGhy5jGCZeT40FMD45yOraIooqSvE2gCjlziH1upbi3JLsRkX2kEyanPngI2RZoX/gByqrfGxs/MXnn33B4tIio6NXOVBdg6l7bYBrrK4u4/WJLNgeLgCFzShXNxyymeIWKlj/Yl4EVSYb3aaSfSWLkiu+J4RBCVkyMBDvDKuX5MZOAGc73lpm9/Xs0fbBzi5p2BC5efFvR7oFlEs90T2L1iHxUeqiQF7hcAugQkCnkVztd7f8mAo4YyAHULRp2kq5KFcgwB4Aiku4c9b5JbRzdpcAuzVeev0+wL4C+woUKvAfO7nSVmrJ+MMAAAAASUVORK5CYII=" alt="You" />
+    </div>
+    <div class="conversation-content-wrapper">
+        <div class="conversation-content">
+            <p>How do I change the configuration so that it uses the App Client of a Microsoft SharePoint site instead?</p>
+        </div>
+    </div>
+</div>
+<div class="conversation-item">
+    <div class="author">
+        <svg width="1.5rem" height="1.5rem" viewBox="0 0 41 41" fill="none" xmlns="http://www.w3.org/2000/svg" strokeWidth="1.5"><path d="M37.5324 16.8707C37.9808 15.5241 38.1363 14.0974 37.9886 12.6859C37.8409 11.2744 37.3934 9.91076 36.676 8.68622C35.6126 6.83404 33.9882 5.3676 32.0373 4.4985C30.0864 3.62941 27.9098 3.40259 25.8215 3.85078C24.8796 2.7893 23.7219 1.94125 22.4257 1.36341C21.1295 0.785575 19.7249 0.491269 18.3058 0.500197C16.1708 0.495044 14.0893 1.16803 12.3614 2.42214C10.6335 3.67624 9.34853 5.44666 8.6917 7.47815C7.30085 7.76286 5.98686 8.3414 4.8377 9.17505C3.68854 10.0087 2.73073 11.0782 2.02839 12.312C0.956464 14.1591 0.498905 16.2988 0.721698 18.4228C0.944492 20.5467 1.83612 22.5449 3.268 24.1293C2.81966 25.4759 2.66413 26.9026 2.81182 28.3141C2.95951 29.7256 3.40701 31.0892 4.12437 32.3138C5.18791 34.1659 6.8123 35.6322 8.76321 36.5013C10.7141 37.3704 12.8907 37.5973 14.9789 37.1492C15.9208 38.2107 17.0786 39.0587 18.3747 39.6366C19.6709 40.2144 21.0755 40.5087 22.4946 40.4998C24.6307 40.5054 26.7133 39.8321 28.4418 38.5772C30.1704 37.3223 31.4556 35.5506 32.1119 33.5179C33.5027 33.2332 34.8167 32.6547 35.9659 31.821C37.115 30.9874 38.0728 29.9178 38.7752 28.684C39.8458 26.8371 40.3023 24.6979 40.0789 22.5748C39.8556 20.4517 38.9639 18.4544 37.5324 16.8707ZM22.4978 37.8849C20.7443 37.8874 19.0459 37.2733 17.6994 36.1501C17.7601 36.117 17.8666 36.0586 17.936 36.0161L25.9004 31.4156C26.1003 31.3019 26.2663 31.137 26.3813 30.9378C26.4964 30.7386 26.5563 30.5124 26.5549 30.2825V19.0542L29.9213 20.998C29.9389 21.0068 29.9541 21.0198 29.9656 21.0359C29.977 21.052 29.9842 21.0707 29.9867 21.0902V30.3889C29.9842 32.375 29.1946 34.2791 27.7909 35.6841C26.3872 37.0892 24.4838 37.8806 22.4978 37.8849ZM6.39227 31.0064C5.51397 29.4888 5.19742 27.7107 5.49804 25.9832C5.55718 26.0187 5.66048 26.0818 5.73461 26.1244L13.699 30.7248C13.8975 30.8408 14.1233 30.902 14.3532 30.902C14.583 30.902 14.8088 30.8408 15.0073 30.7248L24.731 25.1103V28.9979C24.7321 29.0177 24.7283 29.0376 24.7199 29.0556C24.7115 29.0736 24.6988 29.0893 24.6829 29.1012L16.6317 33.7497C14.9096 34.7416 12.8643 35.0097 10.9447 34.4954C9.02506 33.9811 7.38785 32.7263 6.39227 31.0064ZM4.29707 13.6194C5.17156 12.0998 6.55279 10.9364 8.19885 10.3327C8.19885 10.4013 8.19491 10.5228 8.19491 10.6071V19.808C8.19351 20.0378 8.25334 20.2638 8.36823 20.4629C8.48312 20.6619 8.64893 20.8267 8.84863 20.9404L18.5723 26.5542L15.206 28.4979C15.1894 28.5089 15.1703 28.5155 15.1505 28.5173C15.1307 28.5191 15.1107 28.516 15.0924 28.5082L7.04046 23.8557C5.32135 22.8601 4.06716 21.2235 3.55289 19.3046C3.03862 17.3858 3.30624 15.3413 4.29707 13.6194ZM31.955 20.0556L22.2312 14.4411L25.5976 12.4981C25.6142 12.4872 25.6333 12.4805 25.6531 12.4787C25.6729 12.4769 25.6928 12.4801 25.7111 12.4879L33.7631 17.1364C34.9967 17.849 36.0017 18.8982 36.6606 20.1613C37.3194 21.4244 37.6047 22.849 37.4832 24.2684C37.3617 25.6878 36.8382 27.0432 35.9743 28.1759C35.1103 29.3086 33.9415 30.1717 32.6047 30.6641C32.6047 30.5947 32.6047 30.4733 32.6047 30.3889V21.188C32.6066 20.9586 32.5474 20.7328 32.4332 20.5338C32.319 20.3348 32.154 20.1698 31.955 20.0556ZM35.3055 15.0128C35.2464 14.9765 35.1431 14.9142 35.069 14.8717L27.1045 10.2712C26.906 10.1554 26.6803 10.0943 26.4504 10.0943C26.2206 10.0943 25.9948 10.1554 25.7963 10.2712L16.0726 15.8858V11.9982C16.0715 11.9783 16.0753 11.9585 16.0837 11.9405C16.0921 11.9225 16.1048 11.9068 16.1207 11.8949L24.1719 7.25025C25.4053 6.53903 26.8158 6.19376 28.2383 6.25482C29.6608 6.31589 31.0364 6.78077 32.2044 7.59508C33.3723 8.40939 34.2842 9.53945 34.8334 10.8531C35.3826 12.1667 35.5464 13.6095 35.3055 15.0128ZM14.2424 21.9419L10.8752 19.9981C10.8576 19.9893 10.8423 19.9763 10.8309 19.9602C10.8195 19.9441 10.8122 19.9254 10.8098 19.9058V10.6071C10.8107 9.18295 11.2173 7.78848 11.9819 6.58696C12.7466 5.38544 13.8377 4.42659 15.1275 3.82264C16.4173 3.21869 17.8524 2.99464 19.2649 3.1767C20.6775 3.35876 22.0089 3.93941 23.1034 4.85067C23.0427 4.88379 22.937 4.94215 22.8668 4.98473L14.9024 9.58517C14.7025 9.69878 14.5366 9.86356 14.4215 10.0626C14.3065 10.2616 14.2466 10.4877 14.2479 10.7175L14.2424 21.9419ZM16.071 17.9991L20.4018 15.4978L24.7325 17.9975V22.9985L20.4018 25.4983L16.071 22.9985V17.9991Z" fill="currentColor"></path></svg>
+    </div>
+    <div class="conversation-content-wrapper">
+        <div class="conversation-content">
+            <p>Sure, here&#039;s how you can change the configuration to use the App Client of a Microsoft SharePoint site:</p><ol><li>Go to the Azure portal and create a new Azure AD app registration.</li><li>Under &quot;Supported account types&quot;, choose &quot;Accounts in this organizational directory only&quot;.</li><li>Under &quot;Redirect URI (optional)&quot;, choose &quot;Web&quot; and enter &quot;<a href="http://localhost:53682/" target="_blank" rel="noopener noreferrer">http://localhost:53682/</a>&quot;.</li><li>Take note of the &quot;Application (client) ID&quot; and &quot;Directory (tenant) ID&quot;.</li><li>Under &quot;Certificates &amp; secrets&quot;, create a new client secret and take note of the value.</li><li>Go to the SharePoint admin center and grant the Azure AD app registration the &quot;Tenant&quot; and &quot;Site Collection Administrator&quot; roles.</li><li>Open a command prompt or terminal and run the command &quot;rclone config&quot; to start the configuration process.</li><li>Edit the existing remote you created for your SharePoint site by typing &quot;e&quot; and choosing the appropriate number.</li><li>Enter the &quot;Application (client) ID&quot; as the &quot;Microsoft App Client ID&quot;.</li><li>Enter the client secret value you generated as the &quot;Microsoft App Client Secret&quot;.</li><li>Enter the &quot;Directory (tenant) ID&quot; as the &quot;Microsoft App Tenant ID&quot;.</li><li>Choose &quot;no&quot; for &quot;Edit advanced config?&quot;.</li><li>Choose &quot;no&quot; for &quot;Use auto config?&quot;.</li><li>Type &quot;q&quot; to exit the configuration process.</li></ol><p>That&#039;s it! You can now use rclone to backup files to or from your Microsoft SharePoint site using the updated configuration.</p>
+        </div>
+    </div>
+</div>
+<div class="conversation-item">
+    <div class="author">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAABBVJREFUWEftlutPW2Ucxz/nUnqhQAYqWGCibDO64Jb4wluMJgY2HDCnTLKli1Ff+Ed4+zt4ycwS3YRMGJcB68gwJCSa8MoRtm4xk4sFDLbO0vZczHN6CqflrB2YveNJmuac5/L7PN/f7Ui9F780yRsSIH6ANeN4zl/o8iQ2mFvbSy4Xp+8D5Ctgy53nlCfugq8c5iQwbf/viIvH8eieYuDrbYBdB10hVA6gIK5zQe1yB6n34pMCyEEUd6HU2+cAsAgfvcE0TSRJQpFldMOw89ROuy3XiWdhXMyLIW+ntasCfd8U6lWwQUIY9qgeUqkUsiLj8/kwDINMJgVSBkWRwVTRdROPx2MZz2ib6LqGqvpKAXzrArCNqipZw7V1tSwtLaMqCoHyclaWl6mte5pUOoHP78PQFBKJfy11gpXl6PomsiyRTuu2Cu5BLPX2FQcQLonHE3i9Xjyqap0SDAYtKMPUkWXNepfJSKQ2M9a6VDpJoLwMVZXRNHE/t8zKApUESKXStLa2Eo1GWVtbtwxXVlbQ3NzM1FSEioqAZaC2tpHnm5qZnZ3l+PEW7tz9jYyWQtNELPwPgGQySTgctuSfmZlBkmSOHn2Zt159m/FbI0Sjd62bnzp1hoA/yMjoCD0fd3Pj5nVWVv6grKysaAEpqcDDh//Q1dmFP1DOlctX0HSdEyfaaGioZ2Fhgenpn6kIVnH+3Cfcvr3A3NwcPT3d3IiMsfKnABBB+egwKwkgIvnQocO8/tob9A/0o2s67e+3c//+PUKhEENDwzQdfIH2k6fpH7hKIpGwFJiMjBKLLaGokp2WdlJK+e4oAWBaPvd6/VwIf8rE+KR1yivHWrg5NUFnRwfDw9d58chLFuSlS98T8FfS03OWycgIsdgiikcYzNUEkHcLIHI8talzsu1D1tfjxONx6uuf4ceB7whfOM+D32OEQs+S1hIMXxsjVHeEzo4uJiKDxFYfZBVwABQGREkFJFFjdJVjLW/y3MHDVnGJ3ptnemaM1tb3eKq6nuqaA/zy6y3m5+9QXdVEZ8dpJiI/OQD2HAPZ5qLIZfh9NZztPme5ZHBogI2/l2hsbODdd9rIaGkGhy5jGCZeT40FMD45yOraIooqSvE2gCjlziH1upbi3JLsRkX2kEyanPngI2RZoX/gByqrfGxs/MXnn33B4tIio6NXOVBdg6l7bYBrrK4u4/WJLNgeLgCFzShXNxyymeIWKlj/Yl4EVSYb3aaSfSWLkiu+J4RBCVkyMBDvDKuX5MZOAGc73lpm9/Xs0fbBzi5p2BC5efFvR7oFlEs90T2L1iHxUeqiQF7hcAugQkCnkVztd7f8mAo4YyAHULRp2kq5KFcgwB4Aiku4c9b5JbRzdpcAuzVeev0+wL4C+woUKvAfO7nSVmrJ+MMAAAAASUVORK5CYII=" alt="You" />
+    </div>
+    <div class="conversation-content-wrapper">
+        <div class="conversation-content">
+            <p>what is the other alternative to using Azure App? I don&#039;t have permission to create Azure AD app but I do have full control over the SharePoint Site</p>
+        </div>
+    </div>
+</div>
+<div class="conversation-item">
+    <div class="author">
+        <svg width="1.5rem" height="1.5rem" viewBox="0 0 41 41" fill="none" xmlns="http://www.w3.org/2000/svg" strokeWidth="1.5"><path d="M37.5324 16.8707C37.9808 15.5241 38.1363 14.0974 37.9886 12.6859C37.8409 11.2744 37.3934 9.91076 36.676 8.68622C35.6126 6.83404 33.9882 5.3676 32.0373 4.4985C30.0864 3.62941 27.9098 3.40259 25.8215 3.85078C24.8796 2.7893 23.7219 1.94125 22.4257 1.36341C21.1295 0.785575 19.7249 0.491269 18.3058 0.500197C16.1708 0.495044 14.0893 1.16803 12.3614 2.42214C10.6335 3.67624 9.34853 5.44666 8.6917 7.47815C7.30085 7.76286 5.98686 8.3414 4.8377 9.17505C3.68854 10.0087 2.73073 11.0782 2.02839 12.312C0.956464 14.1591 0.498905 16.2988 0.721698 18.4228C0.944492 20.5467 1.83612 22.5449 3.268 24.1293C2.81966 25.4759 2.66413 26.9026 2.81182 28.3141C2.95951 29.7256 3.40701 31.0892 4.12437 32.3138C5.18791 34.1659 6.8123 35.6322 8.76321 36.5013C10.7141 37.3704 12.8907 37.5973 14.9789 37.1492C15.9208 38.2107 17.0786 39.0587 18.3747 39.6366C19.6709 40.2144 21.0755 40.5087 22.4946 40.4998C24.6307 40.5054 26.7133 39.8321 28.4418 38.5772C30.1704 37.3223 31.4556 35.5506 32.1119 33.5179C33.5027 33.2332 34.8167 32.6547 35.9659 31.821C37.115 30.9874 38.0728 29.9178 38.7752 28.684C39.8458 26.8371 40.3023 24.6979 40.0789 22.5748C39.8556 20.4517 38.9639 18.4544 37.5324 16.8707ZM22.4978 37.8849C20.7443 37.8874 19.0459 37.2733 17.6994 36.1501C17.7601 36.117 17.8666 36.0586 17.936 36.0161L25.9004 31.4156C26.1003 31.3019 26.2663 31.137 26.3813 30.9378C26.4964 30.7386 26.5563 30.5124 26.5549 30.2825V19.0542L29.9213 20.998C29.9389 21.0068 29.9541 21.0198 29.9656 21.0359C29.977 21.052 29.9842 21.0707 29.9867 21.0902V30.3889C29.9842 32.375 29.1946 34.2791 27.7909 35.6841C26.3872 37.0892 24.4838 37.8806 22.4978 37.8849ZM6.39227 31.0064C5.51397 29.4888 5.19742 27.7107 5.49804 25.9832C5.55718 26.0187 5.66048 26.0818 5.73461 26.1244L13.699 30.7248C13.8975 30.8408 14.1233 30.902 14.3532 30.902C14.583 30.902 14.8088 30.8408 15.0073 30.7248L24.731 25.1103V28.9979C24.7321 29.0177 24.7283 29.0376 24.7199 29.0556C24.7115 29.0736 24.6988 29.0893 24.6829 29.1012L16.6317 33.7497C14.9096 34.7416 12.8643 35.0097 10.9447 34.4954C9.02506 33.9811 7.38785 32.7263 6.39227 31.0064ZM4.29707 13.6194C5.17156 12.0998 6.55279 10.9364 8.19885 10.3327C8.19885 10.4013 8.19491 10.5228 8.19491 10.6071V19.808C8.19351 20.0378 8.25334 20.2638 8.36823 20.4629C8.48312 20.6619 8.64893 20.8267 8.84863 20.9404L18.5723 26.5542L15.206 28.4979C15.1894 28.5089 15.1703 28.5155 15.1505 28.5173C15.1307 28.5191 15.1107 28.516 15.0924 28.5082L7.04046 23.8557C5.32135 22.8601 4.06716 21.2235 3.55289 19.3046C3.03862 17.3858 3.30624 15.3413 4.29707 13.6194ZM31.955 20.0556L22.2312 14.4411L25.5976 12.4981C25.6142 12.4872 25.6333 12.4805 25.6531 12.4787C25.6729 12.4769 25.6928 12.4801 25.7111 12.4879L33.7631 17.1364C34.9967 17.849 36.0017 18.8982 36.6606 20.1613C37.3194 21.4244 37.6047 22.849 37.4832 24.2684C37.3617 25.6878 36.8382 27.0432 35.9743 28.1759C35.1103 29.3086 33.9415 30.1717 32.6047 30.6641C32.6047 30.5947 32.6047 30.4733 32.6047 30.3889V21.188C32.6066 20.9586 32.5474 20.7328 32.4332 20.5338C32.319 20.3348 32.154 20.1698 31.955 20.0556ZM35.3055 15.0128C35.2464 14.9765 35.1431 14.9142 35.069 14.8717L27.1045 10.2712C26.906 10.1554 26.6803 10.0943 26.4504 10.0943C26.2206 10.0943 25.9948 10.1554 25.7963 10.2712L16.0726 15.8858V11.9982C16.0715 11.9783 16.0753 11.9585 16.0837 11.9405C16.0921 11.9225 16.1048 11.9068 16.1207 11.8949L24.1719 7.25025C25.4053 6.53903 26.8158 6.19376 28.2383 6.25482C29.6608 6.31589 31.0364 6.78077 32.2044 7.59508C33.3723 8.40939 34.2842 9.53945 34.8334 10.8531C35.3826 12.1667 35.5464 13.6095 35.3055 15.0128ZM14.2424 21.9419L10.8752 19.9981C10.8576 19.9893 10.8423 19.9763 10.8309 19.9602C10.8195 19.9441 10.8122 19.9254 10.8098 19.9058V10.6071C10.8107 9.18295 11.2173 7.78848 11.9819 6.58696C12.7466 5.38544 13.8377 4.42659 15.1275 3.82264C16.4173 3.21869 17.8524 2.99464 19.2649 3.1767C20.6775 3.35876 22.0089 3.93941 23.1034 4.85067C23.0427 4.88379 22.937 4.94215 22.8668 4.98473L14.9024 9.58517C14.7025 9.69878 14.5366 9.86356 14.4215 10.0626C14.3065 10.2616 14.2466 10.4877 14.2479 10.7175L14.2424 21.9419ZM16.071 17.9991L20.4018 15.4978L24.7325 17.9975V22.9985L20.4018 25.4983L16.071 22.9985V17.9991Z" fill="currentColor"></path></svg>
+    </div>
+    <div class="conversation-content-wrapper">
+        <div class="conversation-content">
+            <p>If you don&#039;t have permission to create an Azure AD app registration, but you have full control over the SharePoint site, you can still use rclone to access your SharePoint files by setting up a custom OAuth app through SharePoint.</p><p>Here are the steps to set up a custom OAuth app in SharePoint for use with rclone:</p><ol><li>Go to your SharePoint site and click on the gear icon in the top right corner, then click on &quot;Site Information&quot; and take note of the &quot;Site Address&quot; URL.</li><li>Click on &quot;Site Contents&quot; and then &quot;Site Settings&quot;.</li><li>Under &quot;Site Collection Administration&quot;, click on &quot;Site collection features&quot;.</li><li>Activate the &quot;OAuth2 App Identifier&quot; feature.</li><li>Go back to &quot;Site Settings&quot; and click on &quot;OAuth consent settings&quot; under &quot;Site App Permissions&quot;.</li><li>Choose &quot;Allow user consent for apps that don&#039;t require permissions&quot; and click &quot;Save&quot;.</li><li>Click on &quot;App Invitations&quot; under &quot;Site App Permissions&quot;.</li><li>Click &quot;New invitation&quot;.</li><li>Enter a name for your app and click &quot;Create&quot;.</li><li>Take note of the &quot;Client Id&quot; and &quot;Client Secret&quot; values.</li><li>Open a command prompt or terminal and run the command &quot;rclone config&quot; to start the configuration process.</li><li>Edit the existing remote you created for your SharePoint site by typing &quot;e&quot; and choosing the appropriate number.</li><li>Enter the &quot;Site Address&quot; URL as the &quot;Microsoft Site URL&quot;.</li><li>Enter the &quot;Client Id&quot; as the &quot;Microsoft Client ID&quot;.</li><li>Enter the &quot;Client Secret&quot; as the &quot;Microsoft Client Secret&quot;.</li><li>Choose &quot;no&quot; for &quot;Edit advanced config?&quot;.</li><li>Choose &quot;no&quot; for &quot;Use auto config?&quot;.</li><li>Type &quot;q&quot; to exit the configuration process.</li></ol><p>That&#039;s it! You can now use rclone to backup files to or from your SharePoint site using the updated configuration. Note that for security reasons, you should keep your client secret value confidential and not share it with others.</p>
+        </div>
+    </div>
+</div>
+<div class="conversation-item">
+    <div class="author">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAABBVJREFUWEftlutPW2Ucxz/nUnqhQAYqWGCibDO64Jb4wluMJgY2HDCnTLKli1Ff+Ed4+zt4ycwS3YRMGJcB68gwJCSa8MoRtm4xk4sFDLbO0vZczHN6CqflrB2YveNJmuac5/L7PN/f7Ui9F780yRsSIH6ANeN4zl/o8iQ2mFvbSy4Xp+8D5Ctgy53nlCfugq8c5iQwbf/viIvH8eieYuDrbYBdB10hVA6gIK5zQe1yB6n34pMCyEEUd6HU2+cAsAgfvcE0TSRJQpFldMOw89ROuy3XiWdhXMyLIW+ntasCfd8U6lWwQUIY9qgeUqkUsiLj8/kwDINMJgVSBkWRwVTRdROPx2MZz2ib6LqGqvpKAXzrArCNqipZw7V1tSwtLaMqCoHyclaWl6mte5pUOoHP78PQFBKJfy11gpXl6PomsiyRTuu2Cu5BLPX2FQcQLonHE3i9Xjyqap0SDAYtKMPUkWXNepfJSKQ2M9a6VDpJoLwMVZXRNHE/t8zKApUESKXStLa2Eo1GWVtbtwxXVlbQ3NzM1FSEioqAZaC2tpHnm5qZnZ3l+PEW7tz9jYyWQtNELPwPgGQySTgctuSfmZlBkmSOHn2Zt159m/FbI0Sjd62bnzp1hoA/yMjoCD0fd3Pj5nVWVv6grKysaAEpqcDDh//Q1dmFP1DOlctX0HSdEyfaaGioZ2Fhgenpn6kIVnH+3Cfcvr3A3NwcPT3d3IiMsfKnABBB+egwKwkgIvnQocO8/tob9A/0o2s67e+3c//+PUKhEENDwzQdfIH2k6fpH7hKIpGwFJiMjBKLLaGokp2WdlJK+e4oAWBaPvd6/VwIf8rE+KR1yivHWrg5NUFnRwfDw9d58chLFuSlS98T8FfS03OWycgIsdgiikcYzNUEkHcLIHI8talzsu1D1tfjxONx6uuf4ceB7whfOM+D32OEQs+S1hIMXxsjVHeEzo4uJiKDxFYfZBVwABQGREkFJFFjdJVjLW/y3MHDVnGJ3ptnemaM1tb3eKq6nuqaA/zy6y3m5+9QXdVEZ8dpJiI/OQD2HAPZ5qLIZfh9NZztPme5ZHBogI2/l2hsbODdd9rIaGkGhy5jGCZeT40FMD45yOraIooqSvE2gCjlziH1upbi3JLsRkX2kEyanPngI2RZoX/gByqrfGxs/MXnn33B4tIio6NXOVBdg6l7bYBrrK4u4/WJLNgeLgCFzShXNxyymeIWKlj/Yl4EVSYb3aaSfSWLkiu+J4RBCVkyMBDvDKuX5MZOAGc73lpm9/Xs0fbBzi5p2BC5efFvR7oFlEs90T2L1iHxUeqiQF7hcAugQkCnkVztd7f8mAo4YyAHULRp2kq5KFcgwB4Aiku4c9b5JbRzdpcAuzVeev0+wL4C+woUKvAfO7nSVmrJ+MMAAAAASUVORK5CYII=" alt="You" />
+    </div>
+    <div class="conversation-content-wrapper">
+        <div class="conversation-content">
+            <p>how do I backup the newly created rclone configuration?</p>
+        </div>
+    </div>
+</div>
+<div class="conversation-item">
+    <div class="author">
+        <svg width="1.5rem" height="1.5rem" viewBox="0 0 41 41" fill="none" xmlns="http://www.w3.org/2000/svg" strokeWidth="1.5"><path d="M37.5324 16.8707C37.9808 15.5241 38.1363 14.0974 37.9886 12.6859C37.8409 11.2744 37.3934 9.91076 36.676 8.68622C35.6126 6.83404 33.9882 5.3676 32.0373 4.4985C30.0864 3.62941 27.9098 3.40259 25.8215 3.85078C24.8796 2.7893 23.7219 1.94125 22.4257 1.36341C21.1295 0.785575 19.7249 0.491269 18.3058 0.500197C16.1708 0.495044 14.0893 1.16803 12.3614 2.42214C10.6335 3.67624 9.34853 5.44666 8.6917 7.47815C7.30085 7.76286 5.98686 8.3414 4.8377 9.17505C3.68854 10.0087 2.73073 11.0782 2.02839 12.312C0.956464 14.1591 0.498905 16.2988 0.721698 18.4228C0.944492 20.5467 1.83612 22.5449 3.268 24.1293C2.81966 25.4759 2.66413 26.9026 2.81182 28.3141C2.95951 29.7256 3.40701 31.0892 4.12437 32.3138C5.18791 34.1659 6.8123 35.6322 8.76321 36.5013C10.7141 37.3704 12.8907 37.5973 14.9789 37.1492C15.9208 38.2107 17.0786 39.0587 18.3747 39.6366C19.6709 40.2144 21.0755 40.5087 22.4946 40.4998C24.6307 40.5054 26.7133 39.8321 28.4418 38.5772C30.1704 37.3223 31.4556 35.5506 32.1119 33.5179C33.5027 33.2332 34.8167 32.6547 35.9659 31.821C37.115 30.9874 38.0728 29.9178 38.7752 28.684C39.8458 26.8371 40.3023 24.6979 40.0789 22.5748C39.8556 20.4517 38.9639 18.4544 37.5324 16.8707ZM22.4978 37.8849C20.7443 37.8874 19.0459 37.2733 17.6994 36.1501C17.7601 36.117 17.8666 36.0586 17.936 36.0161L25.9004 31.4156C26.1003 31.3019 26.2663 31.137 26.3813 30.9378C26.4964 30.7386 26.5563 30.5124 26.5549 30.2825V19.0542L29.9213 20.998C29.9389 21.0068 29.9541 21.0198 29.9656 21.0359C29.977 21.052 29.9842 21.0707 29.9867 21.0902V30.3889C29.9842 32.375 29.1946 34.2791 27.7909 35.6841C26.3872 37.0892 24.4838 37.8806 22.4978 37.8849ZM6.39227 31.0064C5.51397 29.4888 5.19742 27.7107 5.49804 25.9832C5.55718 26.0187 5.66048 26.0818 5.73461 26.1244L13.699 30.7248C13.8975 30.8408 14.1233 30.902 14.3532 30.902C14.583 30.902 14.8088 30.8408 15.0073 30.7248L24.731 25.1103V28.9979C24.7321 29.0177 24.7283 29.0376 24.7199 29.0556C24.7115 29.0736 24.6988 29.0893 24.6829 29.1012L16.6317 33.7497C14.9096 34.7416 12.8643 35.0097 10.9447 34.4954C9.02506 33.9811 7.38785 32.7263 6.39227 31.0064ZM4.29707 13.6194C5.17156 12.0998 6.55279 10.9364 8.19885 10.3327C8.19885 10.4013 8.19491 10.5228 8.19491 10.6071V19.808C8.19351 20.0378 8.25334 20.2638 8.36823 20.4629C8.48312 20.6619 8.64893 20.8267 8.84863 20.9404L18.5723 26.5542L15.206 28.4979C15.1894 28.5089 15.1703 28.5155 15.1505 28.5173C15.1307 28.5191 15.1107 28.516 15.0924 28.5082L7.04046 23.8557C5.32135 22.8601 4.06716 21.2235 3.55289 19.3046C3.03862 17.3858 3.30624 15.3413 4.29707 13.6194ZM31.955 20.0556L22.2312 14.4411L25.5976 12.4981C25.6142 12.4872 25.6333 12.4805 25.6531 12.4787C25.6729 12.4769 25.6928 12.4801 25.7111 12.4879L33.7631 17.1364C34.9967 17.849 36.0017 18.8982 36.6606 20.1613C37.3194 21.4244 37.6047 22.849 37.4832 24.2684C37.3617 25.6878 36.8382 27.0432 35.9743 28.1759C35.1103 29.3086 33.9415 30.1717 32.6047 30.6641C32.6047 30.5947 32.6047 30.4733 32.6047 30.3889V21.188C32.6066 20.9586 32.5474 20.7328 32.4332 20.5338C32.319 20.3348 32.154 20.1698 31.955 20.0556ZM35.3055 15.0128C35.2464 14.9765 35.1431 14.9142 35.069 14.8717L27.1045 10.2712C26.906 10.1554 26.6803 10.0943 26.4504 10.0943C26.2206 10.0943 25.9948 10.1554 25.7963 10.2712L16.0726 15.8858V11.9982C16.0715 11.9783 16.0753 11.9585 16.0837 11.9405C16.0921 11.9225 16.1048 11.9068 16.1207 11.8949L24.1719 7.25025C25.4053 6.53903 26.8158 6.19376 28.2383 6.25482C29.6608 6.31589 31.0364 6.78077 32.2044 7.59508C33.3723 8.40939 34.2842 9.53945 34.8334 10.8531C35.3826 12.1667 35.5464 13.6095 35.3055 15.0128ZM14.2424 21.9419L10.8752 19.9981C10.8576 19.9893 10.8423 19.9763 10.8309 19.9602C10.8195 19.9441 10.8122 19.9254 10.8098 19.9058V10.6071C10.8107 9.18295 11.2173 7.78848 11.9819 6.58696C12.7466 5.38544 13.8377 4.42659 15.1275 3.82264C16.4173 3.21869 17.8524 2.99464 19.2649 3.1767C20.6775 3.35876 22.0089 3.93941 23.1034 4.85067C23.0427 4.88379 22.937 4.94215 22.8668 4.98473L14.9024 9.58517C14.7025 9.69878 14.5366 9.86356 14.4215 10.0626C14.3065 10.2616 14.2466 10.4877 14.2479 10.7175L14.2424 21.9419ZM16.071 17.9991L20.4018 15.4978L24.7325 17.9975V22.9985L20.4018 25.4983L16.071 22.9985V17.9991Z" fill="currentColor"></path></svg>
+    </div>
+    <div class="conversation-content-wrapper">
+        <div class="conversation-content">
+            <p>To backup the rclone configuration you just created, you&#039;ll need to locate the rclone configuration file and save a copy of it.</p><p>The rclone configuration file is typically named &quot;rclone.conf&quot; and is located in your user directory, under a hidden subdirectory named &quot;.config&quot;. The exact path to the configuration file may vary depending on your operating system and installation method.</p><p>Here are the general steps to locate and backup the rclone configuration file:</p><ol><li>Open a file manager or command prompt/terminal and navigate to your user directory.</li><li>Show hidden files and directories. In Windows, you can do this by going to the &quot;View&quot; tab in File Explorer and checking the &quot;Hidden items&quot; checkbox. In Linux or macOS, you can do this by using the keyboard shortcut &quot;Ctrl+H&quot; or &quot;Command+Shift+.&quot; (dot).</li><li>Look for a hidden subdirectory named &quot;.config&quot; in your user directory. If it doesn&#039;t exist, create it.</li><li>Look for a file named &quot;rclone.conf&quot; in the &quot;.config&quot; directory. If it doesn&#039;t exist, create it.</li><li>Save a backup copy of the &quot;rclone.conf&quot; file to a safe location, such as an external hard drive, cloud storage, or another computer.</li></ol><p>You can restore the rclone configuration file from the backup by copying the file to the same location where you found it. This can be useful if you need to transfer your rclone configuration to another computer or restore it after a system reinstall or crash.</p>
+        </div>
+    </div>
+</div>
+<div class="conversation-item">
+    <div class="author">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAABBVJREFUWEftlutPW2Ucxz/nUnqhQAYqWGCibDO64Jb4wluMJgY2HDCnTLKli1Ff+Ed4+zt4ycwS3YRMGJcB68gwJCSa8MoRtm4xk4sFDLbO0vZczHN6CqflrB2YveNJmuac5/L7PN/f7Ui9F780yRsSIH6ANeN4zl/o8iQ2mFvbSy4Xp+8D5Ctgy53nlCfugq8c5iQwbf/viIvH8eieYuDrbYBdB10hVA6gIK5zQe1yB6n34pMCyEEUd6HU2+cAsAgfvcE0TSRJQpFldMOw89ROuy3XiWdhXMyLIW+ntasCfd8U6lWwQUIY9qgeUqkUsiLj8/kwDINMJgVSBkWRwVTRdROPx2MZz2ib6LqGqvpKAXzrArCNqipZw7V1tSwtLaMqCoHyclaWl6mte5pUOoHP78PQFBKJfy11gpXl6PomsiyRTuu2Cu5BLPX2FQcQLonHE3i9Xjyqap0SDAYtKMPUkWXNepfJSKQ2M9a6VDpJoLwMVZXRNHE/t8zKApUESKXStLa2Eo1GWVtbtwxXVlbQ3NzM1FSEioqAZaC2tpHnm5qZnZ3l+PEW7tz9jYyWQtNELPwPgGQySTgctuSfmZlBkmSOHn2Zt159m/FbI0Sjd62bnzp1hoA/yMjoCD0fd3Pj5nVWVv6grKysaAEpqcDDh//Q1dmFP1DOlctX0HSdEyfaaGioZ2Fhgenpn6kIVnH+3Cfcvr3A3NwcPT3d3IiMsfKnABBB+egwKwkgIvnQocO8/tob9A/0o2s67e+3c//+PUKhEENDwzQdfIH2k6fpH7hKIpGwFJiMjBKLLaGokp2WdlJK+e4oAWBaPvd6/VwIf8rE+KR1yivHWrg5NUFnRwfDw9d58chLFuSlS98T8FfS03OWycgIsdgiikcYzNUEkHcLIHI8talzsu1D1tfjxONx6uuf4ceB7whfOM+D32OEQs+S1hIMXxsjVHeEzo4uJiKDxFYfZBVwABQGREkFJFFjdJVjLW/y3MHDVnGJ3ptnemaM1tb3eKq6nuqaA/zy6y3m5+9QXdVEZ8dpJiI/OQD2HAPZ5qLIZfh9NZztPme5ZHBogI2/l2hsbODdd9rIaGkGhy5jGCZeT40FMD45yOraIooqSvE2gCjlziH1upbi3JLsRkX2kEyanPngI2RZoX/gByqrfGxs/MXnn33B4tIio6NXOVBdg6l7bYBrrK4u4/WJLNgeLgCFzShXNxyymeIWKlj/Yl4EVSYb3aaSfSWLkiu+J4RBCVkyMBDvDKuX5MZOAGc73lpm9/Xs0fbBzi5p2BC5efFvR7oFlEs90T2L1iHxUeqiQF7hcAugQkCnkVztd7f8mAo4YyAHULRp2kq5KFcgwB4Aiku4c9b5JbRzdpcAuzVeev0+wL4C+woUKvAfO7nSVmrJ+MMAAAAASUVORK5CYII=" alt="You" />
+    </div>
+    <div class="conversation-content-wrapper">
+        <div class="conversation-content">
+            <p>in the previous steps to set up a custom OAuth app, I don&#039;t see the &quot;OAuth2 App Identifier&quot; feature in &quot;Site collection features&quot;. What can I do?</p>
+        </div>
+    </div>
+</div>
+<div class="conversation-item">
+    <div class="author">
+        <svg width="1.5rem" height="1.5rem" viewBox="0 0 41 41" fill="none" xmlns="http://www.w3.org/2000/svg" strokeWidth="1.5"><path d="M37.5324 16.8707C37.9808 15.5241 38.1363 14.0974 37.9886 12.6859C37.8409 11.2744 37.3934 9.91076 36.676 8.68622C35.6126 6.83404 33.9882 5.3676 32.0373 4.4985C30.0864 3.62941 27.9098 3.40259 25.8215 3.85078C24.8796 2.7893 23.7219 1.94125 22.4257 1.36341C21.1295 0.785575 19.7249 0.491269 18.3058 0.500197C16.1708 0.495044 14.0893 1.16803 12.3614 2.42214C10.6335 3.67624 9.34853 5.44666 8.6917 7.47815C7.30085 7.76286 5.98686 8.3414 4.8377 9.17505C3.68854 10.0087 2.73073 11.0782 2.02839 12.312C0.956464 14.1591 0.498905 16.2988 0.721698 18.4228C0.944492 20.5467 1.83612 22.5449 3.268 24.1293C2.81966 25.4759 2.66413 26.9026 2.81182 28.3141C2.95951 29.7256 3.40701 31.0892 4.12437 32.3138C5.18791 34.1659 6.8123 35.6322 8.76321 36.5013C10.7141 37.3704 12.8907 37.5973 14.9789 37.1492C15.9208 38.2107 17.0786 39.0587 18.3747 39.6366C19.6709 40.2144 21.0755 40.5087 22.4946 40.4998C24.6307 40.5054 26.7133 39.8321 28.4418 38.5772C30.1704 37.3223 31.4556 35.5506 32.1119 33.5179C33.5027 33.2332 34.8167 32.6547 35.9659 31.821C37.115 30.9874 38.0728 29.9178 38.7752 28.684C39.8458 26.8371 40.3023 24.6979 40.0789 22.5748C39.8556 20.4517 38.9639 18.4544 37.5324 16.8707ZM22.4978 37.8849C20.7443 37.8874 19.0459 37.2733 17.6994 36.1501C17.7601 36.117 17.8666 36.0586 17.936 36.0161L25.9004 31.4156C26.1003 31.3019 26.2663 31.137 26.3813 30.9378C26.4964 30.7386 26.5563 30.5124 26.5549 30.2825V19.0542L29.9213 20.998C29.9389 21.0068 29.9541 21.0198 29.9656 21.0359C29.977 21.052 29.9842 21.0707 29.9867 21.0902V30.3889C29.9842 32.375 29.1946 34.2791 27.7909 35.6841C26.3872 37.0892 24.4838 37.8806 22.4978 37.8849ZM6.39227 31.0064C5.51397 29.4888 5.19742 27.7107 5.49804 25.9832C5.55718 26.0187 5.66048 26.0818 5.73461 26.1244L13.699 30.7248C13.8975 30.8408 14.1233 30.902 14.3532 30.902C14.583 30.902 14.8088 30.8408 15.0073 30.7248L24.731 25.1103V28.9979C24.7321 29.0177 24.7283 29.0376 24.7199 29.0556C24.7115 29.0736 24.6988 29.0893 24.6829 29.1012L16.6317 33.7497C14.9096 34.7416 12.8643 35.0097 10.9447 34.4954C9.02506 33.9811 7.38785 32.7263 6.39227 31.0064ZM4.29707 13.6194C5.17156 12.0998 6.55279 10.9364 8.19885 10.3327C8.19885 10.4013 8.19491 10.5228 8.19491 10.6071V19.808C8.19351 20.0378 8.25334 20.2638 8.36823 20.4629C8.48312 20.6619 8.64893 20.8267 8.84863 20.9404L18.5723 26.5542L15.206 28.4979C15.1894 28.5089 15.1703 28.5155 15.1505 28.5173C15.1307 28.5191 15.1107 28.516 15.0924 28.5082L7.04046 23.8557C5.32135 22.8601 4.06716 21.2235 3.55289 19.3046C3.03862 17.3858 3.30624 15.3413 4.29707 13.6194ZM31.955 20.0556L22.2312 14.4411L25.5976 12.4981C25.6142 12.4872 25.6333 12.4805 25.6531 12.4787C25.6729 12.4769 25.6928 12.4801 25.7111 12.4879L33.7631 17.1364C34.9967 17.849 36.0017 18.8982 36.6606 20.1613C37.3194 21.4244 37.6047 22.849 37.4832 24.2684C37.3617 25.6878 36.8382 27.0432 35.9743 28.1759C35.1103 29.3086 33.9415 30.1717 32.6047 30.6641C32.6047 30.5947 32.6047 30.4733 32.6047 30.3889V21.188C32.6066 20.9586 32.5474 20.7328 32.4332 20.5338C32.319 20.3348 32.154 20.1698 31.955 20.0556ZM35.3055 15.0128C35.2464 14.9765 35.1431 14.9142 35.069 14.8717L27.1045 10.2712C26.906 10.1554 26.6803 10.0943 26.4504 10.0943C26.2206 10.0943 25.9948 10.1554 25.7963 10.2712L16.0726 15.8858V11.9982C16.0715 11.9783 16.0753 11.9585 16.0837 11.9405C16.0921 11.9225 16.1048 11.9068 16.1207 11.8949L24.1719 7.25025C25.4053 6.53903 26.8158 6.19376 28.2383 6.25482C29.6608 6.31589 31.0364 6.78077 32.2044 7.59508C33.3723 8.40939 34.2842 9.53945 34.8334 10.8531C35.3826 12.1667 35.5464 13.6095 35.3055 15.0128ZM14.2424 21.9419L10.8752 19.9981C10.8576 19.9893 10.8423 19.9763 10.8309 19.9602C10.8195 19.9441 10.8122 19.9254 10.8098 19.9058V10.6071C10.8107 9.18295 11.2173 7.78848 11.9819 6.58696C12.7466 5.38544 13.8377 4.42659 15.1275 3.82264C16.4173 3.21869 17.8524 2.99464 19.2649 3.1767C20.6775 3.35876 22.0089 3.93941 23.1034 4.85067C23.0427 4.88379 22.937 4.94215 22.8668 4.98473L14.9024 9.58517C14.7025 9.69878 14.5366 9.86356 14.4215 10.0626C14.3065 10.2616 14.2466 10.4877 14.2479 10.7175L14.2424 21.9419ZM16.071 17.9991L20.4018 15.4978L24.7325 17.9975V22.9985L20.4018 25.4983L16.071 22.9985V17.9991Z" fill="currentColor"></path></svg>
+    </div>
+    <div class="conversation-content-wrapper">
+        <div class="conversation-content">
+            <p>If you don&#039;t see the &quot;OAuth2 App Identifier&quot; feature in the &quot;Site collection features&quot; list, it may be because the feature is not enabled for your SharePoint site. In that case, you can try the following steps:</p><ol><li>Go to the SharePoint Admin Center by clicking on the gear icon in the top right corner and selecting &quot;Admin&quot;.</li><li>In the left-hand menu, click on &quot;Settings&quot; and then select &quot;Classic settings page&quot; at the bottom of the page.</li><li>In the &quot;Settings&quot; page, click on &quot;Site collection features&quot; under &quot;Site Collection Administration&quot;.</li><li>Scroll down to find the &quot;OAuth2 App Identifier&quot; feature and click &quot;Activate&quot;.</li><li>Wait for the activation to complete, which may take a few minutes.</li><li>Go back to your SharePoint site and follow the steps I provided earlier to create a custom OAuth app.</li></ol><p>If the &quot;OAuth2 App Identifier&quot; feature is not available in the SharePoint Admin Center either, it may be because the feature is not enabled for your organization&#039;s SharePoint deployment. In that case, you&#039;ll need to contact your SharePoint administrator to see if they can enable the feature for you.</p>
+        </div>
+    </div>
+</div>
+<div class="conversation-item">
+    <div class="author">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAABBVJREFUWEftlutPW2Ucxz/nUnqhQAYqWGCibDO64Jb4wluMJgY2HDCnTLKli1Ff+Ed4+zt4ycwS3YRMGJcB68gwJCSa8MoRtm4xk4sFDLbO0vZczHN6CqflrB2YveNJmuac5/L7PN/f7Ui9F780yRsSIH6ANeN4zl/o8iQ2mFvbSy4Xp+8D5Ctgy53nlCfugq8c5iQwbf/viIvH8eieYuDrbYBdB10hVA6gIK5zQe1yB6n34pMCyEEUd6HU2+cAsAgfvcE0TSRJQpFldMOw89ROuy3XiWdhXMyLIW+ntasCfd8U6lWwQUIY9qgeUqkUsiLj8/kwDINMJgVSBkWRwVTRdROPx2MZz2ib6LqGqvpKAXzrArCNqipZw7V1tSwtLaMqCoHyclaWl6mte5pUOoHP78PQFBKJfy11gpXl6PomsiyRTuu2Cu5BLPX2FQcQLonHE3i9Xjyqap0SDAYtKMPUkWXNepfJSKQ2M9a6VDpJoLwMVZXRNHE/t8zKApUESKXStLa2Eo1GWVtbtwxXVlbQ3NzM1FSEioqAZaC2tpHnm5qZnZ3l+PEW7tz9jYyWQtNELPwPgGQySTgctuSfmZlBkmSOHn2Zt159m/FbI0Sjd62bnzp1hoA/yMjoCD0fd3Pj5nVWVv6grKysaAEpqcDDh//Q1dmFP1DOlctX0HSdEyfaaGioZ2Fhgenpn6kIVnH+3Cfcvr3A3NwcPT3d3IiMsfKnABBB+egwKwkgIvnQocO8/tob9A/0o2s67e+3c//+PUKhEENDwzQdfIH2k6fpH7hKIpGwFJiMjBKLLaGokp2WdlJK+e4oAWBaPvd6/VwIf8rE+KR1yivHWrg5NUFnRwfDw9d58chLFuSlS98T8FfS03OWycgIsdgiikcYzNUEkHcLIHI8talzsu1D1tfjxONx6uuf4ceB7whfOM+D32OEQs+S1hIMXxsjVHeEzo4uJiKDxFYfZBVwABQGREkFJFFjdJVjLW/y3MHDVnGJ3ptnemaM1tb3eKq6nuqaA/zy6y3m5+9QXdVEZ8dpJiI/OQD2HAPZ5qLIZfh9NZztPme5ZHBogI2/l2hsbODdd9rIaGkGhy5jGCZeT40FMD45yOraIooqSvE2gCjlziH1upbi3JLsRkX2kEyanPngI2RZoX/gByqrfGxs/MXnn33B4tIio6NXOVBdg6l7bYBrrK4u4/WJLNgeLgCFzShXNxyymeIWKlj/Yl4EVSYb3aaSfSWLkiu+J4RBCVkyMBDvDKuX5MZOAGc73lpm9/Xs0fbBzi5p2BC5efFvR7oFlEs90T2L1iHxUeqiQF7hcAugQkCnkVztd7f8mAo4YyAHULRp2kq5KFcgwB4Aiku4c9b5JbRzdpcAuzVeev0+wL4C+woUKvAfO7nSVmrJ+MMAAAAASUVORK5CYII=" alt="You" />
+    </div>
+    <div class="conversation-content-wrapper">
+        <div class="conversation-content">
+            <p>can you give an example rclone file of what we had created?</p>
+        </div>
+    </div>
+</div>
+<div class="conversation-item">
+    <div class="author">
+        <svg width="1.5rem" height="1.5rem" viewBox="0 0 41 41" fill="none" xmlns="http://www.w3.org/2000/svg" strokeWidth="1.5"><path d="M37.5324 16.8707C37.9808 15.5241 38.1363 14.0974 37.9886 12.6859C37.8409 11.2744 37.3934 9.91076 36.676 8.68622C35.6126 6.83404 33.9882 5.3676 32.0373 4.4985C30.0864 3.62941 27.9098 3.40259 25.8215 3.85078C24.8796 2.7893 23.7219 1.94125 22.4257 1.36341C21.1295 0.785575 19.7249 0.491269 18.3058 0.500197C16.1708 0.495044 14.0893 1.16803 12.3614 2.42214C10.6335 3.67624 9.34853 5.44666 8.6917 7.47815C7.30085 7.76286 5.98686 8.3414 4.8377 9.17505C3.68854 10.0087 2.73073 11.0782 2.02839 12.312C0.956464 14.1591 0.498905 16.2988 0.721698 18.4228C0.944492 20.5467 1.83612 22.5449 3.268 24.1293C2.81966 25.4759 2.66413 26.9026 2.81182 28.3141C2.95951 29.7256 3.40701 31.0892 4.12437 32.3138C5.18791 34.1659 6.8123 35.6322 8.76321 36.5013C10.7141 37.3704 12.8907 37.5973 14.9789 37.1492C15.9208 38.2107 17.0786 39.0587 18.3747 39.6366C19.6709 40.2144 21.0755 40.5087 22.4946 40.4998C24.6307 40.5054 26.7133 39.8321 28.4418 38.5772C30.1704 37.3223 31.4556 35.5506 32.1119 33.5179C33.5027 33.2332 34.8167 32.6547 35.9659 31.821C37.115 30.9874 38.0728 29.9178 38.7752 28.684C39.8458 26.8371 40.3023 24.6979 40.0789 22.5748C39.8556 20.4517 38.9639 18.4544 37.5324 16.8707ZM22.4978 37.8849C20.7443 37.8874 19.0459 37.2733 17.6994 36.1501C17.7601 36.117 17.8666 36.0586 17.936 36.0161L25.9004 31.4156C26.1003 31.3019 26.2663 31.137 26.3813 30.9378C26.4964 30.7386 26.5563 30.5124 26.5549 30.2825V19.0542L29.9213 20.998C29.9389 21.0068 29.9541 21.0198 29.9656 21.0359C29.977 21.052 29.9842 21.0707 29.9867 21.0902V30.3889C29.9842 32.375 29.1946 34.2791 27.7909 35.6841C26.3872 37.0892 24.4838 37.8806 22.4978 37.8849ZM6.39227 31.0064C5.51397 29.4888 5.19742 27.7107 5.49804 25.9832C5.55718 26.0187 5.66048 26.0818 5.73461 26.1244L13.699 30.7248C13.8975 30.8408 14.1233 30.902 14.3532 30.902C14.583 30.902 14.8088 30.8408 15.0073 30.7248L24.731 25.1103V28.9979C24.7321 29.0177 24.7283 29.0376 24.7199 29.0556C24.7115 29.0736 24.6988 29.0893 24.6829 29.1012L16.6317 33.7497C14.9096 34.7416 12.8643 35.0097 10.9447 34.4954C9.02506 33.9811 7.38785 32.7263 6.39227 31.0064ZM4.29707 13.6194C5.17156 12.0998 6.55279 10.9364 8.19885 10.3327C8.19885 10.4013 8.19491 10.5228 8.19491 10.6071V19.808C8.19351 20.0378 8.25334 20.2638 8.36823 20.4629C8.48312 20.6619 8.64893 20.8267 8.84863 20.9404L18.5723 26.5542L15.206 28.4979C15.1894 28.5089 15.1703 28.5155 15.1505 28.5173C15.1307 28.5191 15.1107 28.516 15.0924 28.5082L7.04046 23.8557C5.32135 22.8601 4.06716 21.2235 3.55289 19.3046C3.03862 17.3858 3.30624 15.3413 4.29707 13.6194ZM31.955 20.0556L22.2312 14.4411L25.5976 12.4981C25.6142 12.4872 25.6333 12.4805 25.6531 12.4787C25.6729 12.4769 25.6928 12.4801 25.7111 12.4879L33.7631 17.1364C34.9967 17.849 36.0017 18.8982 36.6606 20.1613C37.3194 21.4244 37.6047 22.849 37.4832 24.2684C37.3617 25.6878 36.8382 27.0432 35.9743 28.1759C35.1103 29.3086 33.9415 30.1717 32.6047 30.6641C32.6047 30.5947 32.6047 30.4733 32.6047 30.3889V21.188C32.6066 20.9586 32.5474 20.7328 32.4332 20.5338C32.319 20.3348 32.154 20.1698 31.955 20.0556ZM35.3055 15.0128C35.2464 14.9765 35.1431 14.9142 35.069 14.8717L27.1045 10.2712C26.906 10.1554 26.6803 10.0943 26.4504 10.0943C26.2206 10.0943 25.9948 10.1554 25.7963 10.2712L16.0726 15.8858V11.9982C16.0715 11.9783 16.0753 11.9585 16.0837 11.9405C16.0921 11.9225 16.1048 11.9068 16.1207 11.8949L24.1719 7.25025C25.4053 6.53903 26.8158 6.19376 28.2383 6.25482C29.6608 6.31589 31.0364 6.78077 32.2044 7.59508C33.3723 8.40939 34.2842 9.53945 34.8334 10.8531C35.3826 12.1667 35.5464 13.6095 35.3055 15.0128ZM14.2424 21.9419L10.8752 19.9981C10.8576 19.9893 10.8423 19.9763 10.8309 19.9602C10.8195 19.9441 10.8122 19.9254 10.8098 19.9058V10.6071C10.8107 9.18295 11.2173 7.78848 11.9819 6.58696C12.7466 5.38544 13.8377 4.42659 15.1275 3.82264C16.4173 3.21869 17.8524 2.99464 19.2649 3.1767C20.6775 3.35876 22.0089 3.93941 23.1034 4.85067C23.0427 4.88379 22.937 4.94215 22.8668 4.98473L14.9024 9.58517C14.7025 9.69878 14.5366 9.86356 14.4215 10.0626C14.3065 10.2616 14.2466 10.4877 14.2479 10.7175L14.2424 21.9419ZM16.071 17.9991L20.4018 15.4978L24.7325 17.9975V22.9985L20.4018 25.4983L16.071 22.9985V17.9991Z" fill="currentColor"></path></svg>
+    </div>
+    <div class="conversation-content-wrapper">
+        <div class="conversation-content">
+            <p>Certainly! Here is an example rclone configuration file that we created in the previous steps:</p><pre><code class="language-makefile">[my-sharepoint]
+type = onedrive
+token = {&quot;access_token&quot;:&quot;&lt;your-access-token&gt;&quot;,&quot;expiry&quot;:&quot;0001-01-01T00:00:00Z&quot;}
+drive_id = &lt;your-drive-id&gt;
+drive_type = documentLibrary
+url = https://&lt;your-organization&gt;.sharepoint.com
+</code></pre><p>This configuration defines a remote named &quot;my-sharepoint&quot; that uses the Microsoft OneDrive backend to access a SharePoint site. It includes the access token and drive ID that we obtained by setting up an Azure AD app, and sets the drive type to &quot;documentLibrary&quot; to specify that we&#039;re accessing a document library.</p><p>Note that the access token value in this configuration is specific to your app and user account, and should not be shared with others. You should always keep your access token confidential and secure. If you need to share your rclone configuration with others, it&#039;s best to remove the access token value and let them obtain their own access tokens using the same Azure AD app registration process.</p>
+        </div>
+    </div>
+</div>
+<div class="conversation-item">
+    <div class="author">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAABBVJREFUWEftlutPW2Ucxz/nUnqhQAYqWGCibDO64Jb4wluMJgY2HDCnTLKli1Ff+Ed4+zt4ycwS3YRMGJcB68gwJCSa8MoRtm4xk4sFDLbO0vZczHN6CqflrB2YveNJmuac5/L7PN/f7Ui9F780yRsSIH6ANeN4zl/o8iQ2mFvbSy4Xp+8D5Ctgy53nlCfugq8c5iQwbf/viIvH8eieYuDrbYBdB10hVA6gIK5zQe1yB6n34pMCyEEUd6HU2+cAsAgfvcE0TSRJQpFldMOw89ROuy3XiWdhXMyLIW+ntasCfd8U6lWwQUIY9qgeUqkUsiLj8/kwDINMJgVSBkWRwVTRdROPx2MZz2ib6LqGqvpKAXzrArCNqipZw7V1tSwtLaMqCoHyclaWl6mte5pUOoHP78PQFBKJfy11gpXl6PomsiyRTuu2Cu5BLPX2FQcQLonHE3i9Xjyqap0SDAYtKMPUkWXNepfJSKQ2M9a6VDpJoLwMVZXRNHE/t8zKApUESKXStLa2Eo1GWVtbtwxXVlbQ3NzM1FSEioqAZaC2tpHnm5qZnZ3l+PEW7tz9jYyWQtNELPwPgGQySTgctuSfmZlBkmSOHn2Zt159m/FbI0Sjd62bnzp1hoA/yMjoCD0fd3Pj5nVWVv6grKysaAEpqcDDh//Q1dmFP1DOlctX0HSdEyfaaGioZ2Fhgenpn6kIVnH+3Cfcvr3A3NwcPT3d3IiMsfKnABBB+egwKwkgIvnQocO8/tob9A/0o2s67e+3c//+PUKhEENDwzQdfIH2k6fpH7hKIpGwFJiMjBKLLaGokp2WdlJK+e4oAWBaPvd6/VwIf8rE+KR1yivHWrg5NUFnRwfDw9d58chLFuSlS98T8FfS03OWycgIsdgiikcYzNUEkHcLIHI8talzsu1D1tfjxONx6uuf4ceB7whfOM+D32OEQs+S1hIMXxsjVHeEzo4uJiKDxFYfZBVwABQGREkFJFFjdJVjLW/y3MHDVnGJ3ptnemaM1tb3eKq6nuqaA/zy6y3m5+9QXdVEZ8dpJiI/OQD2HAPZ5qLIZfh9NZztPme5ZHBogI2/l2hsbODdd9rIaGkGhy5jGCZeT40FMD45yOraIooqSvE2gCjlziH1upbi3JLsRkX2kEyanPngI2RZoX/gByqrfGxs/MXnn33B4tIio6NXOVBdg6l7bYBrrK4u4/WJLNgeLgCFzShXNxyymeIWKlj/Yl4EVSYb3aaSfSWLkiu+J4RBCVkyMBDvDKuX5MZOAGc73lpm9/Xs0fbBzi5p2BC5efFvR7oFlEs90T2L1iHxUeqiQF7hcAugQkCnkVztd7f8mAo4YyAHULRp2kq5KFcgwB4Aiku4c9b5JbRzdpcAuzVeev0+wL4C+woUKvAfO7nSVmrJ+MMAAAAASUVORK5CYII=" alt="You" />
+    </div>
+    <div class="conversation-content-wrapper">
+        <div class="conversation-content">
+            <p>that&#039;s very impressive. How about an example config file using the SharePoint Site App?</p>
+        </div>
+    </div>
+</div>
+<div class="conversation-item">
+    <div class="author">
+        <svg width="1.5rem" height="1.5rem" viewBox="0 0 41 41" fill="none" xmlns="http://www.w3.org/2000/svg" strokeWidth="1.5"><path d="M37.5324 16.8707C37.9808 15.5241 38.1363 14.0974 37.9886 12.6859C37.8409 11.2744 37.3934 9.91076 36.676 8.68622C35.6126 6.83404 33.9882 5.3676 32.0373 4.4985C30.0864 3.62941 27.9098 3.40259 25.8215 3.85078C24.8796 2.7893 23.7219 1.94125 22.4257 1.36341C21.1295 0.785575 19.7249 0.491269 18.3058 0.500197C16.1708 0.495044 14.0893 1.16803 12.3614 2.42214C10.6335 3.67624 9.34853 5.44666 8.6917 7.47815C7.30085 7.76286 5.98686 8.3414 4.8377 9.17505C3.68854 10.0087 2.73073 11.0782 2.02839 12.312C0.956464 14.1591 0.498905 16.2988 0.721698 18.4228C0.944492 20.5467 1.83612 22.5449 3.268 24.1293C2.81966 25.4759 2.66413 26.9026 2.81182 28.3141C2.95951 29.7256 3.40701 31.0892 4.12437 32.3138C5.18791 34.1659 6.8123 35.6322 8.76321 36.5013C10.7141 37.3704 12.8907 37.5973 14.9789 37.1492C15.9208 38.2107 17.0786 39.0587 18.3747 39.6366C19.6709 40.2144 21.0755 40.5087 22.4946 40.4998C24.6307 40.5054 26.7133 39.8321 28.4418 38.5772C30.1704 37.3223 31.4556 35.5506 32.1119 33.5179C33.5027 33.2332 34.8167 32.6547 35.9659 31.821C37.115 30.9874 38.0728 29.9178 38.7752 28.684C39.8458 26.8371 40.3023 24.6979 40.0789 22.5748C39.8556 20.4517 38.9639 18.4544 37.5324 16.8707ZM22.4978 37.8849C20.7443 37.8874 19.0459 37.2733 17.6994 36.1501C17.7601 36.117 17.8666 36.0586 17.936 36.0161L25.9004 31.4156C26.1003 31.3019 26.2663 31.137 26.3813 30.9378C26.4964 30.7386 26.5563 30.5124 26.5549 30.2825V19.0542L29.9213 20.998C29.9389 21.0068 29.9541 21.0198 29.9656 21.0359C29.977 21.052 29.9842 21.0707 29.9867 21.0902V30.3889C29.9842 32.375 29.1946 34.2791 27.7909 35.6841C26.3872 37.0892 24.4838 37.8806 22.4978 37.8849ZM6.39227 31.0064C5.51397 29.4888 5.19742 27.7107 5.49804 25.9832C5.55718 26.0187 5.66048 26.0818 5.73461 26.1244L13.699 30.7248C13.8975 30.8408 14.1233 30.902 14.3532 30.902C14.583 30.902 14.8088 30.8408 15.0073 30.7248L24.731 25.1103V28.9979C24.7321 29.0177 24.7283 29.0376 24.7199 29.0556C24.7115 29.0736 24.6988 29.0893 24.6829 29.1012L16.6317 33.7497C14.9096 34.7416 12.8643 35.0097 10.9447 34.4954C9.02506 33.9811 7.38785 32.7263 6.39227 31.0064ZM4.29707 13.6194C5.17156 12.0998 6.55279 10.9364 8.19885 10.3327C8.19885 10.4013 8.19491 10.5228 8.19491 10.6071V19.808C8.19351 20.0378 8.25334 20.2638 8.36823 20.4629C8.48312 20.6619 8.64893 20.8267 8.84863 20.9404L18.5723 26.5542L15.206 28.4979C15.1894 28.5089 15.1703 28.5155 15.1505 28.5173C15.1307 28.5191 15.1107 28.516 15.0924 28.5082L7.04046 23.8557C5.32135 22.8601 4.06716 21.2235 3.55289 19.3046C3.03862 17.3858 3.30624 15.3413 4.29707 13.6194ZM31.955 20.0556L22.2312 14.4411L25.5976 12.4981C25.6142 12.4872 25.6333 12.4805 25.6531 12.4787C25.6729 12.4769 25.6928 12.4801 25.7111 12.4879L33.7631 17.1364C34.9967 17.849 36.0017 18.8982 36.6606 20.1613C37.3194 21.4244 37.6047 22.849 37.4832 24.2684C37.3617 25.6878 36.8382 27.0432 35.9743 28.1759C35.1103 29.3086 33.9415 30.1717 32.6047 30.6641C32.6047 30.5947 32.6047 30.4733 32.6047 30.3889V21.188C32.6066 20.9586 32.5474 20.7328 32.4332 20.5338C32.319 20.3348 32.154 20.1698 31.955 20.0556ZM35.3055 15.0128C35.2464 14.9765 35.1431 14.9142 35.069 14.8717L27.1045 10.2712C26.906 10.1554 26.6803 10.0943 26.4504 10.0943C26.2206 10.0943 25.9948 10.1554 25.7963 10.2712L16.0726 15.8858V11.9982C16.0715 11.9783 16.0753 11.9585 16.0837 11.9405C16.0921 11.9225 16.1048 11.9068 16.1207 11.8949L24.1719 7.25025C25.4053 6.53903 26.8158 6.19376 28.2383 6.25482C29.6608 6.31589 31.0364 6.78077 32.2044 7.59508C33.3723 8.40939 34.2842 9.53945 34.8334 10.8531C35.3826 12.1667 35.5464 13.6095 35.3055 15.0128ZM14.2424 21.9419L10.8752 19.9981C10.8576 19.9893 10.8423 19.9763 10.8309 19.9602C10.8195 19.9441 10.8122 19.9254 10.8098 19.9058V10.6071C10.8107 9.18295 11.2173 7.78848 11.9819 6.58696C12.7466 5.38544 13.8377 4.42659 15.1275 3.82264C16.4173 3.21869 17.8524 2.99464 19.2649 3.1767C20.6775 3.35876 22.0089 3.93941 23.1034 4.85067C23.0427 4.88379 22.937 4.94215 22.8668 4.98473L14.9024 9.58517C14.7025 9.69878 14.5366 9.86356 14.4215 10.0626C14.3065 10.2616 14.2466 10.4877 14.2479 10.7175L14.2424 21.9419ZM16.071 17.9991L20.4018 15.4978L24.7325 17.9975V22.9985L20.4018 25.4983L16.071 22.9985V17.9991Z" fill="currentColor"></path></svg>
+    </div>
+    <div class="conversation-content-wrapper">
+        <div class="conversation-content">
+            <p>Sure! Here&#039;s an example rclone configuration file that uses the SharePoint Site App instead of the Azure AD app:</p><pre><code class="language-makefile">[my-sharepoint]
+type = onedrive
+token = {&quot;access_token&quot;:&quot;&lt;your-access-token&gt;&quot;,&quot;expiry&quot;:&quot;0001-01-01T00:00:00Z&quot;}
+drive_id = &lt;your-drive-id&gt;
+drive_type = documentLibrary
+url = https://&lt;your-organization&gt;.sharepoint.com
+client_id = &lt;your-client-id&gt;
+client_secret = &lt;your-client-secret&gt;
+</code></pre><p>This configuration is similar to the previous one, but instead of using an access token, it includes the client ID and client secret values that we obtained by registering a SharePoint app. The client ID value is specified using the <code>client_id</code> parameter, and the client secret value is specified using the <code>client_secret</code> parameter.</p><p>Note that the client secret value should always be kept confidential and secure. If you need to share your rclone configuration with others, it&#039;s best to remove the <code>client_secret</code> parameter and let them obtain their own client secrets using the same SharePoint app registration process.</p>
+        </div>
+    </div>
+</div>
+<div class="conversation-item">
+    <div class="author">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAABBVJREFUWEftlutPW2Ucxz/nUnqhQAYqWGCibDO64Jb4wluMJgY2HDCnTLKli1Ff+Ed4+zt4ycwS3YRMGJcB68gwJCSa8MoRtm4xk4sFDLbO0vZczHN6CqflrB2YveNJmuac5/L7PN/f7Ui9F780yRsSIH6ANeN4zl/o8iQ2mFvbSy4Xp+8D5Ctgy53nlCfugq8c5iQwbf/viIvH8eieYuDrbYBdB10hVA6gIK5zQe1yB6n34pMCyEEUd6HU2+cAsAgfvcE0TSRJQpFldMOw89ROuy3XiWdhXMyLIW+ntasCfd8U6lWwQUIY9qgeUqkUsiLj8/kwDINMJgVSBkWRwVTRdROPx2MZz2ib6LqGqvpKAXzrArCNqipZw7V1tSwtLaMqCoHyclaWl6mte5pUOoHP78PQFBKJfy11gpXl6PomsiyRTuu2Cu5BLPX2FQcQLonHE3i9Xjyqap0SDAYtKMPUkWXNepfJSKQ2M9a6VDpJoLwMVZXRNHE/t8zKApUESKXStLa2Eo1GWVtbtwxXVlbQ3NzM1FSEioqAZaC2tpHnm5qZnZ3l+PEW7tz9jYyWQtNELPwPgGQySTgctuSfmZlBkmSOHn2Zt159m/FbI0Sjd62bnzp1hoA/yMjoCD0fd3Pj5nVWVv6grKysaAEpqcDDh//Q1dmFP1DOlctX0HSdEyfaaGioZ2Fhgenpn6kIVnH+3Cfcvr3A3NwcPT3d3IiMsfKnABBB+egwKwkgIvnQocO8/tob9A/0o2s67e+3c//+PUKhEENDwzQdfIH2k6fpH7hKIpGwFJiMjBKLLaGokp2WdlJK+e4oAWBaPvd6/VwIf8rE+KR1yivHWrg5NUFnRwfDw9d58chLFuSlS98T8FfS03OWycgIsdgiikcYzNUEkHcLIHI8talzsu1D1tfjxONx6uuf4ceB7whfOM+D32OEQs+S1hIMXxsjVHeEzo4uJiKDxFYfZBVwABQGREkFJFFjdJVjLW/y3MHDVnGJ3ptnemaM1tb3eKq6nuqaA/zy6y3m5+9QXdVEZ8dpJiI/OQD2HAPZ5qLIZfh9NZztPme5ZHBogI2/l2hsbODdd9rIaGkGhy5jGCZeT40FMD45yOraIooqSvE2gCjlziH1upbi3JLsRkX2kEyanPngI2RZoX/gByqrfGxs/MXnn33B4tIio6NXOVBdg6l7bYBrrK4u4/WJLNgeLgCFzShXNxyymeIWKlj/Yl4EVSYb3aaSfSWLkiu+J4RBCVkyMBDvDKuX5MZOAGc73lpm9/Xs0fbBzi5p2BC5efFvR7oFlEs90T2L1iHxUeqiQF7hcAugQkCnkVztd7f8mAo4YyAHULRp2kq5KFcgwB4Aiku4c9b5JbRzdpcAuzVeev0+wL4C+woUKvAfO7nSVmrJ+MMAAAAASUVORK5CYII=" alt="You" />
+    </div>
+    <div class="conversation-content-wrapper">
+        <div class="conversation-content">
+            <p>what are your rclone alternative that can help backup local files and folders to onedrive. Where the onedrive account is part of an organization that requires admin approval for rclone to work?</p>
+        </div>
+    </div>
+</div>
+<div class="conversation-item">
+    <div class="author">
+        <svg width="1.5rem" height="1.5rem" viewBox="0 0 41 41" fill="none" xmlns="http://www.w3.org/2000/svg" strokeWidth="1.5"><path d="M37.5324 16.8707C37.9808 15.5241 38.1363 14.0974 37.9886 12.6859C37.8409 11.2744 37.3934 9.91076 36.676 8.68622C35.6126 6.83404 33.9882 5.3676 32.0373 4.4985C30.0864 3.62941 27.9098 3.40259 25.8215 3.85078C24.8796 2.7893 23.7219 1.94125 22.4257 1.36341C21.1295 0.785575 19.7249 0.491269 18.3058 0.500197C16.1708 0.495044 14.0893 1.16803 12.3614 2.42214C10.6335 3.67624 9.34853 5.44666 8.6917 7.47815C7.30085 7.76286 5.98686 8.3414 4.8377 9.17505C3.68854 10.0087 2.73073 11.0782 2.02839 12.312C0.956464 14.1591 0.498905 16.2988 0.721698 18.4228C0.944492 20.5467 1.83612 22.5449 3.268 24.1293C2.81966 25.4759 2.66413 26.9026 2.81182 28.3141C2.95951 29.7256 3.40701 31.0892 4.12437 32.3138C5.18791 34.1659 6.8123 35.6322 8.76321 36.5013C10.7141 37.3704 12.8907 37.5973 14.9789 37.1492C15.9208 38.2107 17.0786 39.0587 18.3747 39.6366C19.6709 40.2144 21.0755 40.5087 22.4946 40.4998C24.6307 40.5054 26.7133 39.8321 28.4418 38.5772C30.1704 37.3223 31.4556 35.5506 32.1119 33.5179C33.5027 33.2332 34.8167 32.6547 35.9659 31.821C37.115 30.9874 38.0728 29.9178 38.7752 28.684C39.8458 26.8371 40.3023 24.6979 40.0789 22.5748C39.8556 20.4517 38.9639 18.4544 37.5324 16.8707ZM22.4978 37.8849C20.7443 37.8874 19.0459 37.2733 17.6994 36.1501C17.7601 36.117 17.8666 36.0586 17.936 36.0161L25.9004 31.4156C26.1003 31.3019 26.2663 31.137 26.3813 30.9378C26.4964 30.7386 26.5563 30.5124 26.5549 30.2825V19.0542L29.9213 20.998C29.9389 21.0068 29.9541 21.0198 29.9656 21.0359C29.977 21.052 29.9842 21.0707 29.9867 21.0902V30.3889C29.9842 32.375 29.1946 34.2791 27.7909 35.6841C26.3872 37.0892 24.4838 37.8806 22.4978 37.8849ZM6.39227 31.0064C5.51397 29.4888 5.19742 27.7107 5.49804 25.9832C5.55718 26.0187 5.66048 26.0818 5.73461 26.1244L13.699 30.7248C13.8975 30.8408 14.1233 30.902 14.3532 30.902C14.583 30.902 14.8088 30.8408 15.0073 30.7248L24.731 25.1103V28.9979C24.7321 29.0177 24.7283 29.0376 24.7199 29.0556C24.7115 29.0736 24.6988 29.0893 24.6829 29.1012L16.6317 33.7497C14.9096 34.7416 12.8643 35.0097 10.9447 34.4954C9.02506 33.9811 7.38785 32.7263 6.39227 31.0064ZM4.29707 13.6194C5.17156 12.0998 6.55279 10.9364 8.19885 10.3327C8.19885 10.4013 8.19491 10.5228 8.19491 10.6071V19.808C8.19351 20.0378 8.25334 20.2638 8.36823 20.4629C8.48312 20.6619 8.64893 20.8267 8.84863 20.9404L18.5723 26.5542L15.206 28.4979C15.1894 28.5089 15.1703 28.5155 15.1505 28.5173C15.1307 28.5191 15.1107 28.516 15.0924 28.5082L7.04046 23.8557C5.32135 22.8601 4.06716 21.2235 3.55289 19.3046C3.03862 17.3858 3.30624 15.3413 4.29707 13.6194ZM31.955 20.0556L22.2312 14.4411L25.5976 12.4981C25.6142 12.4872 25.6333 12.4805 25.6531 12.4787C25.6729 12.4769 25.6928 12.4801 25.7111 12.4879L33.7631 17.1364C34.9967 17.849 36.0017 18.8982 36.6606 20.1613C37.3194 21.4244 37.6047 22.849 37.4832 24.2684C37.3617 25.6878 36.8382 27.0432 35.9743 28.1759C35.1103 29.3086 33.9415 30.1717 32.6047 30.6641C32.6047 30.5947 32.6047 30.4733 32.6047 30.3889V21.188C32.6066 20.9586 32.5474 20.7328 32.4332 20.5338C32.319 20.3348 32.154 20.1698 31.955 20.0556ZM35.3055 15.0128C35.2464 14.9765 35.1431 14.9142 35.069 14.8717L27.1045 10.2712C26.906 10.1554 26.6803 10.0943 26.4504 10.0943C26.2206 10.0943 25.9948 10.1554 25.7963 10.2712L16.0726 15.8858V11.9982C16.0715 11.9783 16.0753 11.9585 16.0837 11.9405C16.0921 11.9225 16.1048 11.9068 16.1207 11.8949L24.1719 7.25025C25.4053 6.53903 26.8158 6.19376 28.2383 6.25482C29.6608 6.31589 31.0364 6.78077 32.2044 7.59508C33.3723 8.40939 34.2842 9.53945 34.8334 10.8531C35.3826 12.1667 35.5464 13.6095 35.3055 15.0128ZM14.2424 21.9419L10.8752 19.9981C10.8576 19.9893 10.8423 19.9763 10.8309 19.9602C10.8195 19.9441 10.8122 19.9254 10.8098 19.9058V10.6071C10.8107 9.18295 11.2173 7.78848 11.9819 6.58696C12.7466 5.38544 13.8377 4.42659 15.1275 3.82264C16.4173 3.21869 17.8524 2.99464 19.2649 3.1767C20.6775 3.35876 22.0089 3.93941 23.1034 4.85067C23.0427 4.88379 22.937 4.94215 22.8668 4.98473L14.9024 9.58517C14.7025 9.69878 14.5366 9.86356 14.4215 10.0626C14.3065 10.2616 14.2466 10.4877 14.2479 10.7175L14.2424 21.9419ZM16.071 17.9991L20.4018 15.4978L24.7325 17.9975V22.9985L20.4018 25.4983L16.071 22.9985V17.9991Z" fill="currentColor"></path></svg>
+    </div>
+    <div class="conversation-content-wrapper">
+        <div class="conversation-content">
+            <p>There are several rclone alternatives that you can use to backup local files and folders to OneDrive, even in cases where your organization requires admin approval for rclone to work. Here are a few options:</p><ol><li>Microsoft OneDrive sync client: This is the official sync client provided by Microsoft for OneDrive, and it allows you to synchronize files and folders between your local computer and OneDrive. It should work even in cases where admin approval is required for third-party tools like rclone. The OneDrive sync client is available for Windows and Mac.</li><li>GoodSync: GoodSync is a commercial backup and synchronization tool that supports OneDrive, as well as other cloud storage providers. GoodSync offers a user-friendly interface and a range of features, such as backup scheduling, versioning, and bi-directional synchronization. GoodSync is available for Windows, Mac, and Linux.</li><li>Duplicati: Duplicati is a free and open-source backup tool that supports OneDrive, as well as other cloud storage providers. Duplicati offers a range of features, such as backup encryption, compression, and incremental backups. Duplicati is available for Windows, Mac, and Linux.</li><li>odrive: odrive is a cloud storage aggregator that allows you to access and manage files from multiple cloud storage providers, including OneDrive. odrive offers a range of features, such as backup, syncing, and sharing. odrive is available for Windows, Mac, and Linux.</li></ol><p>These tools should allow you to backup your local files and folders to OneDrive, even if admin approval is required for rclone. However, keep in mind that the features and limitations of these tools may vary, and you should choose the one that best fits your needs.</p>
+        </div>
+    </div>
+</div>
+<div class="conversation-item">
+    <div class="author">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAABBVJREFUWEftlutPW2Ucxz/nUnqhQAYqWGCibDO64Jb4wluMJgY2HDCnTLKli1Ff+Ed4+zt4ycwS3YRMGJcB68gwJCSa8MoRtm4xk4sFDLbO0vZczHN6CqflrB2YveNJmuac5/L7PN/f7Ui9F780yRsSIH6ANeN4zl/o8iQ2mFvbSy4Xp+8D5Ctgy53nlCfugq8c5iQwbf/viIvH8eieYuDrbYBdB10hVA6gIK5zQe1yB6n34pMCyEEUd6HU2+cAsAgfvcE0TSRJQpFldMOw89ROuy3XiWdhXMyLIW+ntasCfd8U6lWwQUIY9qgeUqkUsiLj8/kwDINMJgVSBkWRwVTRdROPx2MZz2ib6LqGqvpKAXzrArCNqipZw7V1tSwtLaMqCoHyclaWl6mte5pUOoHP78PQFBKJfy11gpXl6PomsiyRTuu2Cu5BLPX2FQcQLonHE3i9Xjyqap0SDAYtKMPUkWXNepfJSKQ2M9a6VDpJoLwMVZXRNHE/t8zKApUESKXStLa2Eo1GWVtbtwxXVlbQ3NzM1FSEioqAZaC2tpHnm5qZnZ3l+PEW7tz9jYyWQtNELPwPgGQySTgctuSfmZlBkmSOHn2Zt159m/FbI0Sjd62bnzp1hoA/yMjoCD0fd3Pj5nVWVv6grKysaAEpqcDDh//Q1dmFP1DOlctX0HSdEyfaaGioZ2Fhgenpn6kIVnH+3Cfcvr3A3NwcPT3d3IiMsfKnABBB+egwKwkgIvnQocO8/tob9A/0o2s67e+3c//+PUKhEENDwzQdfIH2k6fpH7hKIpGwFJiMjBKLLaGokp2WdlJK+e4oAWBaPvd6/VwIf8rE+KR1yivHWrg5NUFnRwfDw9d58chLFuSlS98T8FfS03OWycgIsdgiikcYzNUEkHcLIHI8talzsu1D1tfjxONx6uuf4ceB7whfOM+D32OEQs+S1hIMXxsjVHeEzo4uJiKDxFYfZBVwABQGREkFJFFjdJVjLW/y3MHDVnGJ3ptnemaM1tb3eKq6nuqaA/zy6y3m5+9QXdVEZ8dpJiI/OQD2HAPZ5qLIZfh9NZztPme5ZHBogI2/l2hsbODdd9rIaGkGhy5jGCZeT40FMD45yOraIooqSvE2gCjlziH1upbi3JLsRkX2kEyanPngI2RZoX/gByqrfGxs/MXnn33B4tIio6NXOVBdg6l7bYBrrK4u4/WJLNgeLgCFzShXNxyymeIWKlj/Yl4EVSYb3aaSfSWLkiu+J4RBCVkyMBDvDKuX5MZOAGc73lpm9/Xs0fbBzi5p2BC5efFvR7oFlEs90T2L1iHxUeqiQF7hcAugQkCnkVztd7f8mAo4YyAHULRp2kq5KFcgwB4Aiku4c9b5JbRzdpcAuzVeev0+wL4C+woUKvAfO7nSVmrJ+MMAAAAASUVORK5CYII=" alt="You" />
+    </div>
+    <div class="conversation-content-wrapper">
+        <div class="conversation-content">
+            <p>Microsoft onedrive sync client looks good. However, it fails when there is a symlink anywhere in a sync folder source. How do we get around that?</p>
+        </div>
+    </div>
+</div>
+<div class="conversation-item">
+    <div class="author">
+        <svg width="1.5rem" height="1.5rem" viewBox="0 0 41 41" fill="none" xmlns="http://www.w3.org/2000/svg" strokeWidth="1.5"><path d="M37.5324 16.8707C37.9808 15.5241 38.1363 14.0974 37.9886 12.6859C37.8409 11.2744 37.3934 9.91076 36.676 8.68622C35.6126 6.83404 33.9882 5.3676 32.0373 4.4985C30.0864 3.62941 27.9098 3.40259 25.8215 3.85078C24.8796 2.7893 23.7219 1.94125 22.4257 1.36341C21.1295 0.785575 19.7249 0.491269 18.3058 0.500197C16.1708 0.495044 14.0893 1.16803 12.3614 2.42214C10.6335 3.67624 9.34853 5.44666 8.6917 7.47815C7.30085 7.76286 5.98686 8.3414 4.8377 9.17505C3.68854 10.0087 2.73073 11.0782 2.02839 12.312C0.956464 14.1591 0.498905 16.2988 0.721698 18.4228C0.944492 20.5467 1.83612 22.5449 3.268 24.1293C2.81966 25.4759 2.66413 26.9026 2.81182 28.3141C2.95951 29.7256 3.40701 31.0892 4.12437 32.3138C5.18791 34.1659 6.8123 35.6322 8.76321 36.5013C10.7141 37.3704 12.8907 37.5973 14.9789 37.1492C15.9208 38.2107 17.0786 39.0587 18.3747 39.6366C19.6709 40.2144 21.0755 40.5087 22.4946 40.4998C24.6307 40.5054 26.7133 39.8321 28.4418 38.5772C30.1704 37.3223 31.4556 35.5506 32.1119 33.5179C33.5027 33.2332 34.8167 32.6547 35.9659 31.821C37.115 30.9874 38.0728 29.9178 38.7752 28.684C39.8458 26.8371 40.3023 24.6979 40.0789 22.5748C39.8556 20.4517 38.9639 18.4544 37.5324 16.8707ZM22.4978 37.8849C20.7443 37.8874 19.0459 37.2733 17.6994 36.1501C17.7601 36.117 17.8666 36.0586 17.936 36.0161L25.9004 31.4156C26.1003 31.3019 26.2663 31.137 26.3813 30.9378C26.4964 30.7386 26.5563 30.5124 26.5549 30.2825V19.0542L29.9213 20.998C29.9389 21.0068 29.9541 21.0198 29.9656 21.0359C29.977 21.052 29.9842 21.0707 29.9867 21.0902V30.3889C29.9842 32.375 29.1946 34.2791 27.7909 35.6841C26.3872 37.0892 24.4838 37.8806 22.4978 37.8849ZM6.39227 31.0064C5.51397 29.4888 5.19742 27.7107 5.49804 25.9832C5.55718 26.0187 5.66048 26.0818 5.73461 26.1244L13.699 30.7248C13.8975 30.8408 14.1233 30.902 14.3532 30.902C14.583 30.902 14.8088 30.8408 15.0073 30.7248L24.731 25.1103V28.9979C24.7321 29.0177 24.7283 29.0376 24.7199 29.0556C24.7115 29.0736 24.6988 29.0893 24.6829 29.1012L16.6317 33.7497C14.9096 34.7416 12.8643 35.0097 10.9447 34.4954C9.02506 33.9811 7.38785 32.7263 6.39227 31.0064ZM4.29707 13.6194C5.17156 12.0998 6.55279 10.9364 8.19885 10.3327C8.19885 10.4013 8.19491 10.5228 8.19491 10.6071V19.808C8.19351 20.0378 8.25334 20.2638 8.36823 20.4629C8.48312 20.6619 8.64893 20.8267 8.84863 20.9404L18.5723 26.5542L15.206 28.4979C15.1894 28.5089 15.1703 28.5155 15.1505 28.5173C15.1307 28.5191 15.1107 28.516 15.0924 28.5082L7.04046 23.8557C5.32135 22.8601 4.06716 21.2235 3.55289 19.3046C3.03862 17.3858 3.30624 15.3413 4.29707 13.6194ZM31.955 20.0556L22.2312 14.4411L25.5976 12.4981C25.6142 12.4872 25.6333 12.4805 25.6531 12.4787C25.6729 12.4769 25.6928 12.4801 25.7111 12.4879L33.7631 17.1364C34.9967 17.849 36.0017 18.8982 36.6606 20.1613C37.3194 21.4244 37.6047 22.849 37.4832 24.2684C37.3617 25.6878 36.8382 27.0432 35.9743 28.1759C35.1103 29.3086 33.9415 30.1717 32.6047 30.6641C32.6047 30.5947 32.6047 30.4733 32.6047 30.3889V21.188C32.6066 20.9586 32.5474 20.7328 32.4332 20.5338C32.319 20.3348 32.154 20.1698 31.955 20.0556ZM35.3055 15.0128C35.2464 14.9765 35.1431 14.9142 35.069 14.8717L27.1045 10.2712C26.906 10.1554 26.6803 10.0943 26.4504 10.0943C26.2206 10.0943 25.9948 10.1554 25.7963 10.2712L16.0726 15.8858V11.9982C16.0715 11.9783 16.0753 11.9585 16.0837 11.9405C16.0921 11.9225 16.1048 11.9068 16.1207 11.8949L24.1719 7.25025C25.4053 6.53903 26.8158 6.19376 28.2383 6.25482C29.6608 6.31589 31.0364 6.78077 32.2044 7.59508C33.3723 8.40939 34.2842 9.53945 34.8334 10.8531C35.3826 12.1667 35.5464 13.6095 35.3055 15.0128ZM14.2424 21.9419L10.8752 19.9981C10.8576 19.9893 10.8423 19.9763 10.8309 19.9602C10.8195 19.9441 10.8122 19.9254 10.8098 19.9058V10.6071C10.8107 9.18295 11.2173 7.78848 11.9819 6.58696C12.7466 5.38544 13.8377 4.42659 15.1275 3.82264C16.4173 3.21869 17.8524 2.99464 19.2649 3.1767C20.6775 3.35876 22.0089 3.93941 23.1034 4.85067C23.0427 4.88379 22.937 4.94215 22.8668 4.98473L14.9024 9.58517C14.7025 9.69878 14.5366 9.86356 14.4215 10.0626C14.3065 10.2616 14.2466 10.4877 14.2479 10.7175L14.2424 21.9419ZM16.071 17.9991L20.4018 15.4978L24.7325 17.9975V22.9985L20.4018 25.4983L16.071 22.9985V17.9991Z" fill="currentColor"></path></svg>
+    </div>
+    <div class="conversation-content-wrapper">
+        <div class="conversation-content">
+            <p>If the Microsoft OneDrive sync client fails when there is a symlink anywhere in a sync folder source, you may be able to work around the issue by creating a junction point instead of a symlink.</p><p>A junction point is similar to a symlink, but it is implemented at the file system level, rather than as a symbolic link. To create a junction point, you can use the <code>mklink</code> command in a command prompt or PowerShell window, like this:</p><pre><code class="language-php-template">mklink /J &lt;junction-point&gt; &lt;target-folder&gt;
+</code></pre><p>Here, <code>&lt;junction-point&gt;</code> is the name of the junction point you want to create, and <code>&lt;target-folder&gt;</code> is the name of the folder that you want to link to. For example, if you want to create a junction point named &quot;myjunction&quot; that links to a folder named &quot;C:\myfolder&quot;, you would use the following command:</p><pre><code class="language-">mklink /J myjunction C:\myfolder
+</code></pre><p>Once you&#039;ve created the junction point, you can include it in your OneDrive sync folder source instead of the symlink. The OneDrive sync client should be able to follow the junction point and synchronize the linked folder as expected.</p><p>Keep in mind that junction points can only link to local folders, not remote folders or network shares. If you need to link to a remote folder, you may need to use a different tool that supports symlinks or remote file systems.</p>
+        </div>
+    </div>
+</div>
+<div class="conversation-item">
+    <div class="author">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAABBVJREFUWEftlutPW2Ucxz/nUnqhQAYqWGCibDO64Jb4wluMJgY2HDCnTLKli1Ff+Ed4+zt4ycwS3YRMGJcB68gwJCSa8MoRtm4xk4sFDLbO0vZczHN6CqflrB2YveNJmuac5/L7PN/f7Ui9F780yRsSIH6ANeN4zl/o8iQ2mFvbSy4Xp+8D5Ctgy53nlCfugq8c5iQwbf/viIvH8eieYuDrbYBdB10hVA6gIK5zQe1yB6n34pMCyEEUd6HU2+cAsAgfvcE0TSRJQpFldMOw89ROuy3XiWdhXMyLIW+ntasCfd8U6lWwQUIY9qgeUqkUsiLj8/kwDINMJgVSBkWRwVTRdROPx2MZz2ib6LqGqvpKAXzrArCNqipZw7V1tSwtLaMqCoHyclaWl6mte5pUOoHP78PQFBKJfy11gpXl6PomsiyRTuu2Cu5BLPX2FQcQLonHE3i9Xjyqap0SDAYtKMPUkWXNepfJSKQ2M9a6VDpJoLwMVZXRNHE/t8zKApUESKXStLa2Eo1GWVtbtwxXVlbQ3NzM1FSEioqAZaC2tpHnm5qZnZ3l+PEW7tz9jYyWQtNELPwPgGQySTgctuSfmZlBkmSOHn2Zt159m/FbI0Sjd62bnzp1hoA/yMjoCD0fd3Pj5nVWVv6grKysaAEpqcDDh//Q1dmFP1DOlctX0HSdEyfaaGioZ2Fhgenpn6kIVnH+3Cfcvr3A3NwcPT3d3IiMsfKnABBB+egwKwkgIvnQocO8/tob9A/0o2s67e+3c//+PUKhEENDwzQdfIH2k6fpH7hKIpGwFJiMjBKLLaGokp2WdlJK+e4oAWBaPvd6/VwIf8rE+KR1yivHWrg5NUFnRwfDw9d58chLFuSlS98T8FfS03OWycgIsdgiikcYzNUEkHcLIHI8talzsu1D1tfjxONx6uuf4ceB7whfOM+D32OEQs+S1hIMXxsjVHeEzo4uJiKDxFYfZBVwABQGREkFJFFjdJVjLW/y3MHDVnGJ3ptnemaM1tb3eKq6nuqaA/zy6y3m5+9QXdVEZ8dpJiI/OQD2HAPZ5qLIZfh9NZztPme5ZHBogI2/l2hsbODdd9rIaGkGhy5jGCZeT40FMD45yOraIooqSvE2gCjlziH1upbi3JLsRkX2kEyanPngI2RZoX/gByqrfGxs/MXnn33B4tIio6NXOVBdg6l7bYBrrK4u4/WJLNgeLgCFzShXNxyymeIWKlj/Yl4EVSYb3aaSfSWLkiu+J4RBCVkyMBDvDKuX5MZOAGc73lpm9/Xs0fbBzi5p2BC5efFvR7oFlEs90T2L1iHxUeqiQF7hcAugQkCnkVztd7f8mAo4YyAHULRp2kq5KFcgwB4Aiku4c9b5JbRzdpcAuzVeev0+wL4C+woUKvAfO7nSVmrJ+MMAAAAASUVORK5CYII=" alt="You" />
+    </div>
+    <div class="conversation-content-wrapper">
+        <div class="conversation-content">
+            <p>I am getting the error of  &quot;We&#039;re having trouble connecting to the OneDrive service. Check your connection or try again later.&quot; when trying to backup &quot;document&quot; folder using OneDrive Desktop. How can I solve this?</p>
+        </div>
+    </div>
+</div>
+<div class="conversation-item">
+    <div class="author">
+        <svg width="1.5rem" height="1.5rem" viewBox="0 0 41 41" fill="none" xmlns="http://www.w3.org/2000/svg" strokeWidth="1.5"><path d="M37.5324 16.8707C37.9808 15.5241 38.1363 14.0974 37.9886 12.6859C37.8409 11.2744 37.3934 9.91076 36.676 8.68622C35.6126 6.83404 33.9882 5.3676 32.0373 4.4985C30.0864 3.62941 27.9098 3.40259 25.8215 3.85078C24.8796 2.7893 23.7219 1.94125 22.4257 1.36341C21.1295 0.785575 19.7249 0.491269 18.3058 0.500197C16.1708 0.495044 14.0893 1.16803 12.3614 2.42214C10.6335 3.67624 9.34853 5.44666 8.6917 7.47815C7.30085 7.76286 5.98686 8.3414 4.8377 9.17505C3.68854 10.0087 2.73073 11.0782 2.02839 12.312C0.956464 14.1591 0.498905 16.2988 0.721698 18.4228C0.944492 20.5467 1.83612 22.5449 3.268 24.1293C2.81966 25.4759 2.66413 26.9026 2.81182 28.3141C2.95951 29.7256 3.40701 31.0892 4.12437 32.3138C5.18791 34.1659 6.8123 35.6322 8.76321 36.5013C10.7141 37.3704 12.8907 37.5973 14.9789 37.1492C15.9208 38.2107 17.0786 39.0587 18.3747 39.6366C19.6709 40.2144 21.0755 40.5087 22.4946 40.4998C24.6307 40.5054 26.7133 39.8321 28.4418 38.5772C30.1704 37.3223 31.4556 35.5506 32.1119 33.5179C33.5027 33.2332 34.8167 32.6547 35.9659 31.821C37.115 30.9874 38.0728 29.9178 38.7752 28.684C39.8458 26.8371 40.3023 24.6979 40.0789 22.5748C39.8556 20.4517 38.9639 18.4544 37.5324 16.8707ZM22.4978 37.8849C20.7443 37.8874 19.0459 37.2733 17.6994 36.1501C17.7601 36.117 17.8666 36.0586 17.936 36.0161L25.9004 31.4156C26.1003 31.3019 26.2663 31.137 26.3813 30.9378C26.4964 30.7386 26.5563 30.5124 26.5549 30.2825V19.0542L29.9213 20.998C29.9389 21.0068 29.9541 21.0198 29.9656 21.0359C29.977 21.052 29.9842 21.0707 29.9867 21.0902V30.3889C29.9842 32.375 29.1946 34.2791 27.7909 35.6841C26.3872 37.0892 24.4838 37.8806 22.4978 37.8849ZM6.39227 31.0064C5.51397 29.4888 5.19742 27.7107 5.49804 25.9832C5.55718 26.0187 5.66048 26.0818 5.73461 26.1244L13.699 30.7248C13.8975 30.8408 14.1233 30.902 14.3532 30.902C14.583 30.902 14.8088 30.8408 15.0073 30.7248L24.731 25.1103V28.9979C24.7321 29.0177 24.7283 29.0376 24.7199 29.0556C24.7115 29.0736 24.6988 29.0893 24.6829 29.1012L16.6317 33.7497C14.9096 34.7416 12.8643 35.0097 10.9447 34.4954C9.02506 33.9811 7.38785 32.7263 6.39227 31.0064ZM4.29707 13.6194C5.17156 12.0998 6.55279 10.9364 8.19885 10.3327C8.19885 10.4013 8.19491 10.5228 8.19491 10.6071V19.808C8.19351 20.0378 8.25334 20.2638 8.36823 20.4629C8.48312 20.6619 8.64893 20.8267 8.84863 20.9404L18.5723 26.5542L15.206 28.4979C15.1894 28.5089 15.1703 28.5155 15.1505 28.5173C15.1307 28.5191 15.1107 28.516 15.0924 28.5082L7.04046 23.8557C5.32135 22.8601 4.06716 21.2235 3.55289 19.3046C3.03862 17.3858 3.30624 15.3413 4.29707 13.6194ZM31.955 20.0556L22.2312 14.4411L25.5976 12.4981C25.6142 12.4872 25.6333 12.4805 25.6531 12.4787C25.6729 12.4769 25.6928 12.4801 25.7111 12.4879L33.7631 17.1364C34.9967 17.849 36.0017 18.8982 36.6606 20.1613C37.3194 21.4244 37.6047 22.849 37.4832 24.2684C37.3617 25.6878 36.8382 27.0432 35.9743 28.1759C35.1103 29.3086 33.9415 30.1717 32.6047 30.6641C32.6047 30.5947 32.6047 30.4733 32.6047 30.3889V21.188C32.6066 20.9586 32.5474 20.7328 32.4332 20.5338C32.319 20.3348 32.154 20.1698 31.955 20.0556ZM35.3055 15.0128C35.2464 14.9765 35.1431 14.9142 35.069 14.8717L27.1045 10.2712C26.906 10.1554 26.6803 10.0943 26.4504 10.0943C26.2206 10.0943 25.9948 10.1554 25.7963 10.2712L16.0726 15.8858V11.9982C16.0715 11.9783 16.0753 11.9585 16.0837 11.9405C16.0921 11.9225 16.1048 11.9068 16.1207 11.8949L24.1719 7.25025C25.4053 6.53903 26.8158 6.19376 28.2383 6.25482C29.6608 6.31589 31.0364 6.78077 32.2044 7.59508C33.3723 8.40939 34.2842 9.53945 34.8334 10.8531C35.3826 12.1667 35.5464 13.6095 35.3055 15.0128ZM14.2424 21.9419L10.8752 19.9981C10.8576 19.9893 10.8423 19.9763 10.8309 19.9602C10.8195 19.9441 10.8122 19.9254 10.8098 19.9058V10.6071C10.8107 9.18295 11.2173 7.78848 11.9819 6.58696C12.7466 5.38544 13.8377 4.42659 15.1275 3.82264C16.4173 3.21869 17.8524 2.99464 19.2649 3.1767C20.6775 3.35876 22.0089 3.93941 23.1034 4.85067C23.0427 4.88379 22.937 4.94215 22.8668 4.98473L14.9024 9.58517C14.7025 9.69878 14.5366 9.86356 14.4215 10.0626C14.3065 10.2616 14.2466 10.4877 14.2479 10.7175L14.2424 21.9419ZM16.071 17.9991L20.4018 15.4978L24.7325 17.9975V22.9985L20.4018 25.4983L16.071 22.9985V17.9991Z" fill="currentColor"></path></svg>
+    </div>
+    <div class="conversation-content-wrapper">
+        <div class="conversation-content">
+            <p>If you&#039;re getting the error &quot;We&#039;re having trouble connecting to the OneDrive service. Check your connection or try again later&quot; when trying to backup your &quot;Documents&quot; folder using the OneDrive Desktop app, there are a few things you can try to resolve the issue:</p><ol><li>Check your internet connection: Make sure that your computer is connected to the internet and that your connection is stable. If you&#039;re using a wireless connection, try connecting your computer directly to your router using an Ethernet cable to rule out any wireless connectivity issues.</li><li>Check the OneDrive service status: Visit the Microsoft OneDrive status page to see if there are any known issues or outages with the service. If there is an outage or issue, you may need to wait until the service is back online before you can backup your files.</li><li>Restart the OneDrive Desktop app: Sometimes restarting the OneDrive Desktop app can help resolve connectivity issues. To do this, right-click on the OneDrive icon in your system tray (near the clock), select &quot;Close OneDrive&quot;, and then restart the app from the Start menu.</li><li>Reset the OneDrive Desktop app: If restarting the app doesn&#039;t help, you can try resetting the app. To do this, right-click on the OneDrive icon in your system tray, select &quot;Settings&quot;, go to the &quot;Account&quot; tab, and click &quot;Unlink OneDrive&quot;. Then, restart the OneDrive app and sign in again.</li><li>Check your OneDrive account: Make sure that your OneDrive account is active and that you have enough storage space to backup your files. If you&#039;re using a work or school account, check with your administrator to make sure that your account is set up correctly.</li><li>Disable any antivirus or firewall software: Some antivirus or firewall software can interfere with the OneDrive Desktop app&#039;s connectivity. Try temporarily disabling any such software to see if that resolves the issue.</li></ol><p>If none of these steps work, you can try reinstalling the OneDrive Desktop app. You can download the latest version of the app from the Microsoft website.</p>
+        </div>
+    </div>
+</div>
+<div class="conversation-item">
+    <div class="author">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAABBVJREFUWEftlutPW2Ucxz/nUnqhQAYqWGCibDO64Jb4wluMJgY2HDCnTLKli1Ff+Ed4+zt4ycwS3YRMGJcB68gwJCSa8MoRtm4xk4sFDLbO0vZczHN6CqflrB2YveNJmuac5/L7PN/f7Ui9F780yRsSIH6ANeN4zl/o8iQ2mFvbSy4Xp+8D5Ctgy53nlCfugq8c5iQwbf/viIvH8eieYuDrbYBdB10hVA6gIK5zQe1yB6n34pMCyEEUd6HU2+cAsAgfvcE0TSRJQpFldMOw89ROuy3XiWdhXMyLIW+ntasCfd8U6lWwQUIY9qgeUqkUsiLj8/kwDINMJgVSBkWRwVTRdROPx2MZz2ib6LqGqvpKAXzrArCNqipZw7V1tSwtLaMqCoHyclaWl6mte5pUOoHP78PQFBKJfy11gpXl6PomsiyRTuu2Cu5BLPX2FQcQLonHE3i9Xjyqap0SDAYtKMPUkWXNepfJSKQ2M9a6VDpJoLwMVZXRNHE/t8zKApUESKXStLa2Eo1GWVtbtwxXVlbQ3NzM1FSEioqAZaC2tpHnm5qZnZ3l+PEW7tz9jYyWQtNELPwPgGQySTgctuSfmZlBkmSOHn2Zt159m/FbI0Sjd62bnzp1hoA/yMjoCD0fd3Pj5nVWVv6grKysaAEpqcDDh//Q1dmFP1DOlctX0HSdEyfaaGioZ2Fhgenpn6kIVnH+3Cfcvr3A3NwcPT3d3IiMsfKnABBB+egwKwkgIvnQocO8/tob9A/0o2s67e+3c//+PUKhEENDwzQdfIH2k6fpH7hKIpGwFJiMjBKLLaGokp2WdlJK+e4oAWBaPvd6/VwIf8rE+KR1yivHWrg5NUFnRwfDw9d58chLFuSlS98T8FfS03OWycgIsdgiikcYzNUEkHcLIHI8talzsu1D1tfjxONx6uuf4ceB7whfOM+D32OEQs+S1hIMXxsjVHeEzo4uJiKDxFYfZBVwABQGREkFJFFjdJVjLW/y3MHDVnGJ3ptnemaM1tb3eKq6nuqaA/zy6y3m5+9QXdVEZ8dpJiI/OQD2HAPZ5qLIZfh9NZztPme5ZHBogI2/l2hsbODdd9rIaGkGhy5jGCZeT40FMD45yOraIooqSvE2gCjlziH1upbi3JLsRkX2kEyanPngI2RZoX/gByqrfGxs/MXnn33B4tIio6NXOVBdg6l7bYBrrK4u4/WJLNgeLgCFzShXNxyymeIWKlj/Yl4EVSYb3aaSfSWLkiu+J4RBCVkyMBDvDKuX5MZOAGc73lpm9/Xs0fbBzi5p2BC5efFvR7oFlEs90T2L1iHxUeqiQF7hcAugQkCnkVztd7f8mAo4YyAHULRp2kq5KFcgwB4Aiku4c9b5JbRzdpcAuzVeev0+wL4C+woUKvAfO7nSVmrJ+MMAAAAASUVORK5CYII=" alt="You" />
+    </div>
+    <div class="conversation-content-wrapper">
+        <div class="conversation-content">
+            <p>unfortunately directory junction is not supported as well on top of symlink. How do I overcome that?</p>
+        </div>
+    </div>
+</div>
+<div class="conversation-item">
+    <div class="author">
+        <svg width="1.5rem" height="1.5rem" viewBox="0 0 41 41" fill="none" xmlns="http://www.w3.org/2000/svg" strokeWidth="1.5"><path d="M37.5324 16.8707C37.9808 15.5241 38.1363 14.0974 37.9886 12.6859C37.8409 11.2744 37.3934 9.91076 36.676 8.68622C35.6126 6.83404 33.9882 5.3676 32.0373 4.4985C30.0864 3.62941 27.9098 3.40259 25.8215 3.85078C24.8796 2.7893 23.7219 1.94125 22.4257 1.36341C21.1295 0.785575 19.7249 0.491269 18.3058 0.500197C16.1708 0.495044 14.0893 1.16803 12.3614 2.42214C10.6335 3.67624 9.34853 5.44666 8.6917 7.47815C7.30085 7.76286 5.98686 8.3414 4.8377 9.17505C3.68854 10.0087 2.73073 11.0782 2.02839 12.312C0.956464 14.1591 0.498905 16.2988 0.721698 18.4228C0.944492 20.5467 1.83612 22.5449 3.268 24.1293C2.81966 25.4759 2.66413 26.9026 2.81182 28.3141C2.95951 29.7256 3.40701 31.0892 4.12437 32.3138C5.18791 34.1659 6.8123 35.6322 8.76321 36.5013C10.7141 37.3704 12.8907 37.5973 14.9789 37.1492C15.9208 38.2107 17.0786 39.0587 18.3747 39.6366C19.6709 40.2144 21.0755 40.5087 22.4946 40.4998C24.6307 40.5054 26.7133 39.8321 28.4418 38.5772C30.1704 37.3223 31.4556 35.5506 32.1119 33.5179C33.5027 33.2332 34.8167 32.6547 35.9659 31.821C37.115 30.9874 38.0728 29.9178 38.7752 28.684C39.8458 26.8371 40.3023 24.6979 40.0789 22.5748C39.8556 20.4517 38.9639 18.4544 37.5324 16.8707ZM22.4978 37.8849C20.7443 37.8874 19.0459 37.2733 17.6994 36.1501C17.7601 36.117 17.8666 36.0586 17.936 36.0161L25.9004 31.4156C26.1003 31.3019 26.2663 31.137 26.3813 30.9378C26.4964 30.7386 26.5563 30.5124 26.5549 30.2825V19.0542L29.9213 20.998C29.9389 21.0068 29.9541 21.0198 29.9656 21.0359C29.977 21.052 29.9842 21.0707 29.9867 21.0902V30.3889C29.9842 32.375 29.1946 34.2791 27.7909 35.6841C26.3872 37.0892 24.4838 37.8806 22.4978 37.8849ZM6.39227 31.0064C5.51397 29.4888 5.19742 27.7107 5.49804 25.9832C5.55718 26.0187 5.66048 26.0818 5.73461 26.1244L13.699 30.7248C13.8975 30.8408 14.1233 30.902 14.3532 30.902C14.583 30.902 14.8088 30.8408 15.0073 30.7248L24.731 25.1103V28.9979C24.7321 29.0177 24.7283 29.0376 24.7199 29.0556C24.7115 29.0736 24.6988 29.0893 24.6829 29.1012L16.6317 33.7497C14.9096 34.7416 12.8643 35.0097 10.9447 34.4954C9.02506 33.9811 7.38785 32.7263 6.39227 31.0064ZM4.29707 13.6194C5.17156 12.0998 6.55279 10.9364 8.19885 10.3327C8.19885 10.4013 8.19491 10.5228 8.19491 10.6071V19.808C8.19351 20.0378 8.25334 20.2638 8.36823 20.4629C8.48312 20.6619 8.64893 20.8267 8.84863 20.9404L18.5723 26.5542L15.206 28.4979C15.1894 28.5089 15.1703 28.5155 15.1505 28.5173C15.1307 28.5191 15.1107 28.516 15.0924 28.5082L7.04046 23.8557C5.32135 22.8601 4.06716 21.2235 3.55289 19.3046C3.03862 17.3858 3.30624 15.3413 4.29707 13.6194ZM31.955 20.0556L22.2312 14.4411L25.5976 12.4981C25.6142 12.4872 25.6333 12.4805 25.6531 12.4787C25.6729 12.4769 25.6928 12.4801 25.7111 12.4879L33.7631 17.1364C34.9967 17.849 36.0017 18.8982 36.6606 20.1613C37.3194 21.4244 37.6047 22.849 37.4832 24.2684C37.3617 25.6878 36.8382 27.0432 35.9743 28.1759C35.1103 29.3086 33.9415 30.1717 32.6047 30.6641C32.6047 30.5947 32.6047 30.4733 32.6047 30.3889V21.188C32.6066 20.9586 32.5474 20.7328 32.4332 20.5338C32.319 20.3348 32.154 20.1698 31.955 20.0556ZM35.3055 15.0128C35.2464 14.9765 35.1431 14.9142 35.069 14.8717L27.1045 10.2712C26.906 10.1554 26.6803 10.0943 26.4504 10.0943C26.2206 10.0943 25.9948 10.1554 25.7963 10.2712L16.0726 15.8858V11.9982C16.0715 11.9783 16.0753 11.9585 16.0837 11.9405C16.0921 11.9225 16.1048 11.9068 16.1207 11.8949L24.1719 7.25025C25.4053 6.53903 26.8158 6.19376 28.2383 6.25482C29.6608 6.31589 31.0364 6.78077 32.2044 7.59508C33.3723 8.40939 34.2842 9.53945 34.8334 10.8531C35.3826 12.1667 35.5464 13.6095 35.3055 15.0128ZM14.2424 21.9419L10.8752 19.9981C10.8576 19.9893 10.8423 19.9763 10.8309 19.9602C10.8195 19.9441 10.8122 19.9254 10.8098 19.9058V10.6071C10.8107 9.18295 11.2173 7.78848 11.9819 6.58696C12.7466 5.38544 13.8377 4.42659 15.1275 3.82264C16.4173 3.21869 17.8524 2.99464 19.2649 3.1767C20.6775 3.35876 22.0089 3.93941 23.1034 4.85067C23.0427 4.88379 22.937 4.94215 22.8668 4.98473L14.9024 9.58517C14.7025 9.69878 14.5366 9.86356 14.4215 10.0626C14.3065 10.2616 14.2466 10.4877 14.2479 10.7175L14.2424 21.9419ZM16.071 17.9991L20.4018 15.4978L24.7325 17.9975V22.9985L20.4018 25.4983L16.071 22.9985V17.9991Z" fill="currentColor"></path></svg>
+    </div>
+    <div class="conversation-content-wrapper">
+        <div class="conversation-content">
+            <p>If the Microsoft OneDrive sync client doesn&#039;t support directory junctions as well as symlinks, there are a few other options you can try:</p><ol><li>Use a different syncing tool: If the OneDrive sync client doesn&#039;t meet your needs, you can try using a different syncing tool that supports directory junctions and symlinks. Some examples include Dropbox, Google Drive, and Sync.com.</li><li>Avoid using symlinks and junctions: If possible, you can try to avoid using symlinks and junctions in your backup source folders. For example, you could copy the files you want to backup to a new location that doesn&#039;t use symlinks or junctions.</li><li>Use a different backup method: Instead of syncing your files with OneDrive, you could use a different backup method, such as manually copying your files to an external hard drive or using a cloud backup service like Backblaze or Carbonite.</li><li>Create a script to manually copy files: If you&#039;re comfortable with scripting, you can create a script that manually copies the files you want to backup to a different location. You can then run the script manually or set up a scheduled task to run the script automatically at regular intervals.</li></ol><p>Keep in mind that any of these options may have their own limitations and drawbacks, so it&#039;s important to choose the option that best fits your needs and constraints.</p>
+        </div>
+    </div>
+</div>
+<div class="conversation-item">
+    <div class="author">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAABBVJREFUWEftlutPW2Ucxz/nUnqhQAYqWGCibDO64Jb4wluMJgY2HDCnTLKli1Ff+Ed4+zt4ycwS3YRMGJcB68gwJCSa8MoRtm4xk4sFDLbO0vZczHN6CqflrB2YveNJmuac5/L7PN/f7Ui9F780yRsSIH6ANeN4zl/o8iQ2mFvbSy4Xp+8D5Ctgy53nlCfugq8c5iQwbf/viIvH8eieYuDrbYBdB10hVA6gIK5zQe1yB6n34pMCyEEUd6HU2+cAsAgfvcE0TSRJQpFldMOw89ROuy3XiWdhXMyLIW+ntasCfd8U6lWwQUIY9qgeUqkUsiLj8/kwDINMJgVSBkWRwVTRdROPx2MZz2ib6LqGqvpKAXzrArCNqipZw7V1tSwtLaMqCoHyclaWl6mte5pUOoHP78PQFBKJfy11gpXl6PomsiyRTuu2Cu5BLPX2FQcQLonHE3i9Xjyqap0SDAYtKMPUkWXNepfJSKQ2M9a6VDpJoLwMVZXRNHE/t8zKApUESKXStLa2Eo1GWVtbtwxXVlbQ3NzM1FSEioqAZaC2tpHnm5qZnZ3l+PEW7tz9jYyWQtNELPwPgGQySTgctuSfmZlBkmSOHn2Zt159m/FbI0Sjd62bnzp1hoA/yMjoCD0fd3Pj5nVWVv6grKysaAEpqcDDh//Q1dmFP1DOlctX0HSdEyfaaGioZ2Fhgenpn6kIVnH+3Cfcvr3A3NwcPT3d3IiMsfKnABBB+egwKwkgIvnQocO8/tob9A/0o2s67e+3c//+PUKhEENDwzQdfIH2k6fpH7hKIpGwFJiMjBKLLaGokp2WdlJK+e4oAWBaPvd6/VwIf8rE+KR1yivHWrg5NUFnRwfDw9d58chLFuSlS98T8FfS03OWycgIsdgiikcYzNUEkHcLIHI8talzsu1D1tfjxONx6uuf4ceB7whfOM+D32OEQs+S1hIMXxsjVHeEzo4uJiKDxFYfZBVwABQGREkFJFFjdJVjLW/y3MHDVnGJ3ptnemaM1tb3eKq6nuqaA/zy6y3m5+9QXdVEZ8dpJiI/OQD2HAPZ5qLIZfh9NZztPme5ZHBogI2/l2hsbODdd9rIaGkGhy5jGCZeT40FMD45yOraIooqSvE2gCjlziH1upbi3JLsRkX2kEyanPngI2RZoX/gByqrfGxs/MXnn33B4tIio6NXOVBdg6l7bYBrrK4u4/WJLNgeLgCFzShXNxyymeIWKlj/Yl4EVSYb3aaSfSWLkiu+J4RBCVkyMBDvDKuX5MZOAGc73lpm9/Xs0fbBzi5p2BC5efFvR7oFlEs90T2L1iHxUeqiQF7hcAugQkCnkVztd7f8mAo4YyAHULRp2kq5KFcgwB4Aiku4c9b5JbRzdpcAuzVeev0+wL4C+woUKvAfO7nSVmrJ+MMAAAAASUVORK5CYII=" alt="You" />
+    </div>
+    <div class="conversation-content-wrapper">
+        <div class="conversation-content">
+            <p>OK, I gave up on using OneDrive sync client. Let&#039;s try to make rclone works by using SharePoint app-omly auth method. How can that be done?</p>
+        </div>
+    </div>
+</div>
+<div class="conversation-item">
+    <div class="author">
+        <svg width="1.5rem" height="1.5rem" viewBox="0 0 41 41" fill="none" xmlns="http://www.w3.org/2000/svg" strokeWidth="1.5"><path d="M37.5324 16.8707C37.9808 15.5241 38.1363 14.0974 37.9886 12.6859C37.8409 11.2744 37.3934 9.91076 36.676 8.68622C35.6126 6.83404 33.9882 5.3676 32.0373 4.4985C30.0864 3.62941 27.9098 3.40259 25.8215 3.85078C24.8796 2.7893 23.7219 1.94125 22.4257 1.36341C21.1295 0.785575 19.7249 0.491269 18.3058 0.500197C16.1708 0.495044 14.0893 1.16803 12.3614 2.42214C10.6335 3.67624 9.34853 5.44666 8.6917 7.47815C7.30085 7.76286 5.98686 8.3414 4.8377 9.17505C3.68854 10.0087 2.73073 11.0782 2.02839 12.312C0.956464 14.1591 0.498905 16.2988 0.721698 18.4228C0.944492 20.5467 1.83612 22.5449 3.268 24.1293C2.81966 25.4759 2.66413 26.9026 2.81182 28.3141C2.95951 29.7256 3.40701 31.0892 4.12437 32.3138C5.18791 34.1659 6.8123 35.6322 8.76321 36.5013C10.7141 37.3704 12.8907 37.5973 14.9789 37.1492C15.9208 38.2107 17.0786 39.0587 18.3747 39.6366C19.6709 40.2144 21.0755 40.5087 22.4946 40.4998C24.6307 40.5054 26.7133 39.8321 28.4418 38.5772C30.1704 37.3223 31.4556 35.5506 32.1119 33.5179C33.5027 33.2332 34.8167 32.6547 35.9659 31.821C37.115 30.9874 38.0728 29.9178 38.7752 28.684C39.8458 26.8371 40.3023 24.6979 40.0789 22.5748C39.8556 20.4517 38.9639 18.4544 37.5324 16.8707ZM22.4978 37.8849C20.7443 37.8874 19.0459 37.2733 17.6994 36.1501C17.7601 36.117 17.8666 36.0586 17.936 36.0161L25.9004 31.4156C26.1003 31.3019 26.2663 31.137 26.3813 30.9378C26.4964 30.7386 26.5563 30.5124 26.5549 30.2825V19.0542L29.9213 20.998C29.9389 21.0068 29.9541 21.0198 29.9656 21.0359C29.977 21.052 29.9842 21.0707 29.9867 21.0902V30.3889C29.9842 32.375 29.1946 34.2791 27.7909 35.6841C26.3872 37.0892 24.4838 37.8806 22.4978 37.8849ZM6.39227 31.0064C5.51397 29.4888 5.19742 27.7107 5.49804 25.9832C5.55718 26.0187 5.66048 26.0818 5.73461 26.1244L13.699 30.7248C13.8975 30.8408 14.1233 30.902 14.3532 30.902C14.583 30.902 14.8088 30.8408 15.0073 30.7248L24.731 25.1103V28.9979C24.7321 29.0177 24.7283 29.0376 24.7199 29.0556C24.7115 29.0736 24.6988 29.0893 24.6829 29.1012L16.6317 33.7497C14.9096 34.7416 12.8643 35.0097 10.9447 34.4954C9.02506 33.9811 7.38785 32.7263 6.39227 31.0064ZM4.29707 13.6194C5.17156 12.0998 6.55279 10.9364 8.19885 10.3327C8.19885 10.4013 8.19491 10.5228 8.19491 10.6071V19.808C8.19351 20.0378 8.25334 20.2638 8.36823 20.4629C8.48312 20.6619 8.64893 20.8267 8.84863 20.9404L18.5723 26.5542L15.206 28.4979C15.1894 28.5089 15.1703 28.5155 15.1505 28.5173C15.1307 28.5191 15.1107 28.516 15.0924 28.5082L7.04046 23.8557C5.32135 22.8601 4.06716 21.2235 3.55289 19.3046C3.03862 17.3858 3.30624 15.3413 4.29707 13.6194ZM31.955 20.0556L22.2312 14.4411L25.5976 12.4981C25.6142 12.4872 25.6333 12.4805 25.6531 12.4787C25.6729 12.4769 25.6928 12.4801 25.7111 12.4879L33.7631 17.1364C34.9967 17.849 36.0017 18.8982 36.6606 20.1613C37.3194 21.4244 37.6047 22.849 37.4832 24.2684C37.3617 25.6878 36.8382 27.0432 35.9743 28.1759C35.1103 29.3086 33.9415 30.1717 32.6047 30.6641C32.6047 30.5947 32.6047 30.4733 32.6047 30.3889V21.188C32.6066 20.9586 32.5474 20.7328 32.4332 20.5338C32.319 20.3348 32.154 20.1698 31.955 20.0556ZM35.3055 15.0128C35.2464 14.9765 35.1431 14.9142 35.069 14.8717L27.1045 10.2712C26.906 10.1554 26.6803 10.0943 26.4504 10.0943C26.2206 10.0943 25.9948 10.1554 25.7963 10.2712L16.0726 15.8858V11.9982C16.0715 11.9783 16.0753 11.9585 16.0837 11.9405C16.0921 11.9225 16.1048 11.9068 16.1207 11.8949L24.1719 7.25025C25.4053 6.53903 26.8158 6.19376 28.2383 6.25482C29.6608 6.31589 31.0364 6.78077 32.2044 7.59508C33.3723 8.40939 34.2842 9.53945 34.8334 10.8531C35.3826 12.1667 35.5464 13.6095 35.3055 15.0128ZM14.2424 21.9419L10.8752 19.9981C10.8576 19.9893 10.8423 19.9763 10.8309 19.9602C10.8195 19.9441 10.8122 19.9254 10.8098 19.9058V10.6071C10.8107 9.18295 11.2173 7.78848 11.9819 6.58696C12.7466 5.38544 13.8377 4.42659 15.1275 3.82264C16.4173 3.21869 17.8524 2.99464 19.2649 3.1767C20.6775 3.35876 22.0089 3.93941 23.1034 4.85067C23.0427 4.88379 22.937 4.94215 22.8668 4.98473L14.9024 9.58517C14.7025 9.69878 14.5366 9.86356 14.4215 10.0626C14.3065 10.2616 14.2466 10.4877 14.2479 10.7175L14.2424 21.9419ZM16.071 17.9991L20.4018 15.4978L24.7325 17.9975V22.9985L20.4018 25.4983L16.071 22.9985V17.9991Z" fill="currentColor"></path></svg>
+    </div>
+    <div class="conversation-content-wrapper">
+        <div class="conversation-content">
+            <p>To use the SharePoint App-Only authentication method with rclone, you will need to do the following:</p><ol><li>Register an App in SharePoint: You&#039;ll need to register an app in SharePoint and generate an app client ID and secret. You can follow the steps outlined in my previous answer for registering an app in SharePoint.</li><li>Grant permissions to the App: Once you have registered the app, you&#039;ll need to grant permissions to the app to access the SharePoint site. To do this, go to the &quot;API permissions&quot; section in the app registration portal, and add the necessary permissions for your app. Make sure to grant the &quot;Files.ReadWrite.All&quot; permission to your app.</li><li>Generate the App Access Token: After you have granted permissions to your app, you can generate an app access token. To do this, you&#039;ll need to make a POST request to the following URL:</li></ol><pre><code class="language-bash">https://&lt;your-tenant&gt;.sharepoint.com/sites/&lt;your-site&gt;/_api/contextinfo
+</code></pre><p>Make sure to replace <code>&lt;your-tenant&gt;</code> with the name of your SharePoint tenant and <code>&lt;your-site&gt;</code> with the name of your SharePoint site. You can use a tool like Postman or cURL to make the POST request.</p><p>The response to the POST request will include an access token that you can use with rclone.</p><ol start=4><li>Configure rclone: Finally, you&#039;ll need to configure rclone to use the SharePoint App-Only authentication method. You can use the following configuration file as a template:</li></ol><pre><code class="language-makefile">[onedrive]
+type = onedrive
+token = {&quot;access_token&quot;:&quot;&lt;your-access-token&gt;&quot;,&quot;expiry&quot;:&quot;&lt;token-expiry&gt;&quot;}
+drive_id = &lt;your-drive-id&gt;
+drive_type = documentLibrary
+</code></pre><p>Make sure to replace <code>&lt;your-access-token&gt;</code> with the access token that you generated in step 3, <code>&lt;token-expiry&gt;</code> with the expiration time of the access token, and <code>&lt;your-drive-id&gt;</code> with the ID of the OneDrive for Business document library that you want to use.</p><p>Once you have created the configuration file, you can use rclone to backup your files to OneDrive using the SharePoint App-Only authentication method.</p>
+        </div>
+    </div>
+</div>
+    </div>
+
+
+    <script>
+        function toggleDarkMode() {
+            const html = document.querySelector('html')
+            const isDarkMode = html.getAttribute('data-theme') === 'dark'
+            html.setAttribute('data-theme', isDarkMode ? 'light' : 'dark')
+        }
+
+        document.querySelector('.toggle').addEventListener('click', toggleDarkMode)
+    </script>
+</body>
+
+</html>
