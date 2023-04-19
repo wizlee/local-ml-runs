@@ -4,7 +4,7 @@ Exploring the world of stable difussion and LLMs
 
 ## History
 
-### Trying stable-diffusion-webui
+### Exploring stable-diffusion-webui
 - the `code-workspace` file in this repo contains some bootscraps that assumes you have 
     - a conda environment called `pytorch`. This can be easily modified to any other name.
     - that you are using bash (Git Bash or GNU Bash should both work)
@@ -27,3 +27,17 @@ Exploring the world of stable difussion and LLMs
 - References
     - https://github.com/Stability-AI/StableDiffusion
     - https://github.com/AUTOMATIC1111/stable-diffusion-webui
+
+### Exploring VideoCrafter
+- After following the official setup guide, tried to run VideoControl model
+- Got a warning of symlink not enabled and will result in more disk space use. Two solutions
+    - Run as admin
+    - Enable Developer mode in windows (went for this)
+- Got another error when trying to run model, `AssertionError: Torch not compiled with CUDA enabled`
+    - Tried install torch with cuda `conda install pytorch==1.13.1 torchvision==0.14.1 torchaudio==0.13.1 pytorch-cuda=11.6 -c pytorch -c nvidia`
+    - Found that the solver is too slow and upgraded conda to use [libmamba solver](https://conda.github.io/conda-libmamba-solver/faq/)
+    - Update conda version forcefully using conda install conda={latest conda version} because of this [exact error](https://github.com/conda/conda/issues/8269)
+- Need to install chardet after getting `ModuleNotFoundError: No module named 'chardet'` error
+    - `pip install chardet`
+- However, despite the python command suceed in this stage, ran into the issue of insufficient GPU RAM as stated in the readme of the project
+    - Minimum of 7GB VRAM is needed, my machine had 6GB 😰

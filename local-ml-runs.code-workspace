@@ -5,9 +5,9 @@
 		}
 	],
   "settings": {
-    "terminal.integrated.cwd": "${workspaceFolder}/stable-diffusion-webui",
+    "terminal.integrated.cwd": "${workspaceFolder}/VideoCrafter",
     "terminal.integrated.env.windows": {
-      "BASH_INIT_COMMAND": "conda activate pytorch"
+      "BASH_INIT_COMMAND": "conda activate lvdm"
     }
   },
   "launch": {
