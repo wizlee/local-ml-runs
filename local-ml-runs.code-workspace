@@ -5,7 +5,8 @@
 		}
 	],
   "settings": {
-    "terminal.integrated.cwd": "${workspaceFolder}/VideoCrafter",
+    // "terminal.integrated.cwd": "${workspaceFolder}/VideoCrafter",
+    "terminal.integrated.cwd": "${workspaceFolder}/Genesis",
     "terminal.integrated.env.windows": {
       "BASH_INIT_COMMAND": "conda activate pytorch"
     }

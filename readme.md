@@ -87,3 +87,27 @@ Exploring the world of stable difussion and LLMs
     - Install project from pyproject: `pip install .`
         - This is considered not a good practise when install packages in conda other than python and pip. (we installed pytorch using conda)
         - The reason is pip will override what conda has already resolved and conda will also not know what pip did. 
+
+#### Look Around
+- Ran `python examples/smoke.py`.
+    - Stopped after letting it generates 11 PNG in examples/video.
+    - Ran `gs animate examples/video/*.png` to render a MP4 file using the generated PNGs.
+- Ran `python examples/rendering/demo.py`.
+    - This requires [LuisaRenderer](https://github.com/LuisaGroup/LuisaRender/blob/next/BUILD.md) which requires building from source.
+    - There isn't detailed instruction for windows in the [official guide](https://genesis-world.readthedocs.io/en/latest/user_guide/overview/installation.html#get-luisarender) thus will need to experiment on our own.
+    - Setup steps
+        - install rust: `choco install rust`
+        - Install VS2022 Community and select to install the desktop c++ workload. Uncheck all except for the following individual components.
+            - MSVC build tool
+            - Cmake
+            - Clang
+        - Tips:
+            - clear cmake cache as this causes CMAKE_SIZEOF_VOID_P size to be 4 causing only supported in 64-bit error
+        - Install cudatoolkit as noticed that CUDA backend is not found when running cmake commands `choco install cuda --version=12.0.1.52833`
+            - This particular version is chosen based on [avaibility in chocolatey](https://community.chocolatey.org/packages/cuda/12.0.1.52833), [compabitility table shows in cudatoolkit release note](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/index.html) and output of `nvidia-smi` showing current CUDA driver version.
+        - Set pybind11 installation prefix manually as running in VS Developer Command Prompt means it is not aware of conda env
+        - Open VS Developer Command Prompt
+            - `cd path-go-genesis/genesis/ext/LuisaRender`
+            - `cmake -S . -B build -D CMAKE_BUILD_TYPE=Release -D PYTHON_VERSIONS=3.10 -D LUISA_COMPUTE_DOWNLOAD_NVCOMP=ON -D LUISA_COMPUTE_ENABLE_GUI=OFF`
+            - `cmake --build build -j 12`
+        - `pip install "pybind11[global]" --break-system-packages`
