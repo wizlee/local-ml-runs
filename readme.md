@@ -76,3 +76,14 @@ Exploring the world of stable difussion and LLMs
             ```
     - Conclusions
         - Still hitting the VRAM insufficient issue. Have to put off running any models that requires more than 6GB GPU memory locally. ☠️
+
+### Exploring Genesis
+- Initially try to use the experimental conda-pypi to install this project using `conda pip install .`.
+    - However faces an error that I am not able to quickly overcome.
+- Thus, below is the current steps I took to install this project.
+    - Create env if not exist: `conda create -n pytorch python=3.10`
+        - Activate: `conda activate pytorch`
+    - Install pytorch: `conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia`
+    - Install project from pyproject: `pip install .`
+        - This is considered not a good practise when install packages in conda other than python and pip. (we installed pytorch using conda)
+        - The reason is pip will override what conda has already resolved and conda will also not know what pip did. 
