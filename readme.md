@@ -96,18 +96,29 @@ Exploring the world of stable difussion and LLMs
     - This requires [LuisaRenderer](https://github.com/LuisaGroup/LuisaRender/blob/next/BUILD.md) which requires building from source.
     - There isn't detailed instruction for windows in the [official guide](https://genesis-world.readthedocs.io/en/latest/user_guide/overview/installation.html#get-luisarender) thus will need to experiment on our own.
     - Setup steps
-        - install rust: `choco install rust`
         - Install VS2022 Community and select to install the desktop c++ workload. Uncheck all except for the following individual components.
             - MSVC build tool
             - Cmake
             - Clang
+            - Windows SDK
+        - install rust (msvc buildchain): `choco install rust-ms`
         - Tips:
-            - clear cmake cache as this causes CMAKE_SIZEOF_VOID_P size to be 4 causing only supported in 64-bit error
-        - Install cudatoolkit as noticed that CUDA backend is not found when running cmake commands `choco install cuda --version=12.0.1.52833`
+            - clear cmake cache for fresh build as this causes various issues such as CMAKE_SIZEOF_VOID_P size to be 4 causing only supported in 64-bit error
+        - Install cudatoolkit: `choco install cuda --version=12.0.1.52833`
             - This particular version is chosen based on [avaibility in chocolatey](https://community.chocolatey.org/packages/cuda/12.0.1.52833), [compabitility table shows in cudatoolkit release note](https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/index.html) and output of `nvidia-smi` showing current CUDA driver version.
-        - Set pybind11 installation prefix manually as running in VS Developer Command Prompt means it is not aware of conda env
+            - Install [NVIDIA Texture Tools Exporter (NVTT)](https://developer.nvidia.com/texture-tools-exporter) 
         - Open VS Developer Command Prompt
-            - `cd path-go-genesis/genesis/ext/LuisaRender`
+            - [Optional] add a terminal profile in VS Code for easy starting directory
+            - make sure `pytorch` conda env is activated
+                - `c:\tools\miniconda3\condabin\activate.bat && conda activate pytorch && cd genesis/ext/LuisaRender`
             - `cmake -S . -B build -D CMAKE_BUILD_TYPE=Release -D PYTHON_VERSIONS=3.10 -D LUISA_COMPUTE_DOWNLOAD_NVCOMP=ON -D LUISA_COMPUTE_ENABLE_GUI=OFF`
             - `cmake --build build -j 12`
-        - `pip install "pybind11[global]" --break-system-packages`
+        - More recent steps from [this github issue](https://github.com/Genesis-Embodied-AI/Genesis/issues/76) and [this docs](https://genesis-world.readthedocs.io/en/latest/user_guide/getting_started/visualization.html#setup)
+            - `pip install -e ".[render]" --break-system-packages`
+                - this is equivalent to `pip install "pybind11[global]" --break-system-packages`
+            - `cmake -S . -B build -D CMAKE_BUILD_TYPE=Release -D PYTHON_VERSIONS=3.10 -D LUISA_COMPUTE_DOWNLOAD_NVCOMP=ON`
+            - `cmake --build build -j 12`
+        - Need to install the rest of the dependencies too
+            - `conda install -c conda-forge minizip zlib`
+            - download and install vulkan sdk: https://vulkan.lunarg.com/
+
